@@ -1,0 +1,50 @@
+/*
+ * TIMER.CPP
+ *
+ *  Created on: May 12, 2018
+ *      Author: OS1
+ */
+
+#include "TIMER.H"
+
+volatile int timer_flags=0;
+volatile int timer_count=20;
+
+static unsigned tsp;
+static unsigned tss;
+static unsigned tbp;
+
+void interrupt timer(){	// prekidna rutina
+	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
+	if (timer_count == 0 || TIMER_CHANGE_CONTEXT) {
+		asm {
+			// cuva sp
+			mov tsp, sp
+			mov tss, ss
+		}
+
+		PCB::running->sp = tsp;
+		PCB::running->ss = tss;
+		PCB::running->bp = tbp;
+
+		PCB::running= Scheduler::get();	// Scheduler
+
+		tsp = PCB::running->sp;
+		tss = PCB::running->ss;
+		tbp = PCB::running->bp;
+
+		timer_count = PCB::running->quant;
+
+		asm {
+			mov sp, tsp   // restore sp
+			mov ss, tss
+		}
+	}
+	//Poziv stare prekidne rutine koju smo premestili na 60h
+	if(!(timer_flags & TIMER_CHANGE_CONTEXT))
+		asm int 60h;
+
+	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
+	timer_flags &= ~TIMER_CHANGE_CONTEXT;
+}
+
