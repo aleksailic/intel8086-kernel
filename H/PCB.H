@@ -10,7 +10,7 @@
 #define PCB_H_
 
 #define MASK(n,off) (1u<<(n+off)-1) & (~0<<off)
-#define SET_STATUS_FLAGS(n) flags = (flags & (~15)) + n
+#define SET_STATUS_FLAGS(flags,n) flags = (flags & (~15)) + n
 
 #include "THREAD.H"
 
@@ -37,7 +37,7 @@ public:
 	Thread* myThread;
 
 	PCB();
-	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags);
+	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags=0);
 	static PCB* running;
 	static void triggerRun();
 };

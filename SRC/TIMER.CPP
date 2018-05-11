@@ -5,6 +5,7 @@
  *      Author: OS1
  */
 
+#include <IOSTREAM.H>
 #include "TIMER.H"
 
 volatile int timer_flags=0;
@@ -16,18 +17,21 @@ static unsigned tbp;
 
 void interrupt timer(){	// prekidna rutina
 	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
-	if (timer_count == 0 || TIMER_CHANGE_CONTEXT) {
+	if (timer_count == 0 || (timer_flags & TIMER_CHANGE_CONTEXT)) {
+		//cuvamo sp
 		asm {
-			// cuva sp
 			mov tsp, sp
 			mov tss, ss
+			mov tbp, bp
 		}
 
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
+		PCB::running->flags=PCB_BLOCKED;
 
-		PCB::running= Scheduler::get();	// Scheduler
+		PCB::running= Scheduler::get();
+		PCB::running->flags=PCB_RUNNING;
 
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;
@@ -35,9 +39,11 @@ void interrupt timer(){	// prekidna rutina
 
 		timer_count = PCB::running->quant;
 
+		// restore sp
 		asm {
-			mov sp, tsp   // restore sp
+			mov sp, tsp
 			mov ss, tss
+			mov bp, tbp
 		}
 	}
 	//Poziv stare prekidne rutine koju smo premestili na 60h
@@ -45,6 +51,6 @@ void interrupt timer(){	// prekidna rutina
 		asm int 60h;
 
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
-	timer_flags &= ~TIMER_CHANGE_CONTEXT;
+	timer_flags = timer_flags & (~TIMER_CHANGE_CONTEXT);
 }
 
