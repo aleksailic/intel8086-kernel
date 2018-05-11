@@ -7,11 +7,13 @@
 
 #include "PCB.H"
 #include <DOS.H>
+#include <IOSTREAM.H>
 
 PCB::PCB(){
 	this->flags = PCB_STACKLESS | PCB_THREADLESS;
-	this->quant = 20; //defaultTimeSlice ovde!
+	this->quant = defaultTimeSlice;
 	this->myThread = 0; //opasne igre!
+	this->id=++PCB::idCount;
 }
 
 PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
@@ -28,8 +30,12 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
 		this->quant=quant;
 		this->flags=(flags == 0 ? (quant == 0 ? PCB_UNLIMITED : 0 ) : flags);
 		this->myThread=thread;
+		this->id=++PCB::idCount;
+
+		cout<<"Kreiran PCB "<< this->id << "\n";
 }
 PCB* PCB::running=new PCB(); //Ne postoji nit ali mora postojati PCB
+unsigned PCB::idCount=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
@@ -37,4 +43,6 @@ void PCB::triggerRun(){
 	running->flags = PCB_FINISHED;
 	dispatch();
 }
+
+
 

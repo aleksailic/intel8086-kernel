@@ -37,7 +37,7 @@ void B::run(){
 
 int userMain(int argc, char*argv[]){
 	lock;
-	cout<<"Pokrece se main";
+	cout<<"Pokrece se main\n";
 	A thA;
 	B thB;
 
@@ -59,8 +59,8 @@ int userMain(int argc, char*argv[]){
 }
 
 int main(int argc,char*argv[]){
-  changeTimerRoutine();
-  userMain(argc,argv);
-  restoreTimerRoutine();
-  return 0;
+	changeTimerRoutine();
+	userMain(argc,argv);
+	restoreTimerRoutine();
+	return 0;
 }

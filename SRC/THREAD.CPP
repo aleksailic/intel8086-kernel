@@ -8,11 +8,13 @@
 #include "PCB.H"
 #include "SCHEDULE.H"
 #include "TIMER.H"
+#include <IOSTREAM.H>
 
 Thread::Thread(StackSize sz, Time quant){
 	myPCB = new PCB(sz,quant,this); //namesta flag automatski
 }
 void Thread::start(){
+	cout<<"U scheduler stavljen PCB "<<myPCB->id <<'\n';
 	Scheduler::put(PCB::running);
 }
 

@@ -9,13 +9,14 @@
 #include "TIMER.H"
 
 volatile int timer_flags=0;
-volatile int timer_count=20;
+volatile int timer_count=2;
 
 static unsigned tsp;
 static unsigned tss;
 static unsigned tbp;
 
 void interrupt timer(){	// prekidna rutina
+	cout<<"TIMER: " << timer_count<< '\n';
 	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
 	if (timer_count == 0 || (timer_flags & TIMER_CHANGE_CONTEXT)) {
 		//cuvamo sp
@@ -30,8 +31,11 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->bp = tbp;
 		PCB::running->flags=PCB_BLOCKED;
 
+		Scheduler::put(PCB::running);
 		PCB::running= Scheduler::get();
 		PCB::running->flags=PCB_RUNNING;
+
+		cout<<"NEW RUNNING ID: "<<PCB::running->id<<'\n';
 
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;

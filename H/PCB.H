@@ -32,6 +32,7 @@ public:
 	unsigned long scap;
 	unsigned bp;
 	unsigned* stack;
+	unsigned id;
 	Time quant;
 
 	Thread* myThread;
@@ -40,6 +41,7 @@ public:
 	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags=0);
 	static PCB* running;
 	static void triggerRun();
+	static unsigned idCount;
 };
 
 
