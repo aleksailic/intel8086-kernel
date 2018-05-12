@@ -13,30 +13,30 @@ PCB::PCB(){
 	this->flags = PCB_STACKLESS | PCB_THREADLESS;
 	this->quant = defaultTimeSlice;
 	this->myThread = 0; //opasne igre!
-	this->id=++PCB::idCount;
+	this->id=PCB::lastId++;
 }
 
 PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
 		scap=stackCapacity;
 		stack=new unsigned[1024];
 
-		stack[1023]=0x200;
-		stack[1022]=FP_SEG(PCB::triggerRun);
-		stack[1021]=FP_OFF(PCB::triggerRun);
+		stack[stackCapacity-1]=0x200;
+		stack[stackCapacity-2]=FP_SEG(PCB::triggerRun);
+		stack[stackCapacity-3]=FP_OFF(PCB::triggerRun);
 
-		sp=FP_OFF(stack + 1012);
-		ss=FP_SEG(stack + 1012);
-		bp=FP_OFF(stack + 1012);
+		sp=FP_OFF(stack + stackCapacity - 12);
+		ss=FP_SEG(stack + stackCapacity - 12);
+		bp=FP_OFF(stack + stackCapacity - 12);
 
 		this->quant=quant;
 		this->flags=(flags == 0 ? (quant == 0 ? PCB_UNLIMITED : 0 ) : flags);
 		this->myThread=thread;
-		this->id=++PCB::idCount;
+		this->id=PCB::lastId++;
 
 		cout<<"Kreiran PCB "<< this->id << "\n";
 }
 PCB* PCB::running=new PCB(); //Ne postoji nit ali mora postojati PCB
-unsigned PCB::idCount=0;
+unsigned PCB::lastId=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
@@ -44,6 +44,5 @@ void PCB::triggerRun(){
 	//nakon sto se zavrsio run dispatchujemo
 	dispatch();
 }
-
 
 

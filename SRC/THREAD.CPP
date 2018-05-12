@@ -15,7 +15,7 @@ Thread::Thread(StackSize sz, Time quant){
 }
 void Thread::start(){
 	cout<<"U scheduler stavljen PCB "<<myPCB->id <<'\n';
-	Scheduler::put(PCB::running);
+	Scheduler::put(myPCB);
 }
 
 void Thread::waitToComplete(){

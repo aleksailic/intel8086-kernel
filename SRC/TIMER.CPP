@@ -16,8 +16,8 @@ static unsigned tss;
 static unsigned tbp;
 
 void interrupt timer(){	// prekidna rutina
-	cout<<"TIMER: " << timer_count<< '\n';
-	asm cli;
+	//cout<<"TIMER: " << timer_count<< '\n';
+	//asm cli;
 	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
 	if (timer_count == 0 || (timer_flags & TIMER_CHANGE_CONTEXT)) {
 		//cuvamo sp
