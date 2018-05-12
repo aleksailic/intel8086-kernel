@@ -19,7 +19,7 @@ void Thread::start(){
 }
 
 void Thread::waitToComplete(){
-	while(!CHK_FLAG(myPCB->flags,PCB_FINISHED)){ //ako nije zavrseno
+	if(!CHK_FLAG(myPCB->flags,PCB_FINISHED)){ //ako nije zavrseno
 		//cekaj da se zavrsi: busy wait (ne)? interrupt (mozda + neki queue)? dogadjaji (bingo!)
 	}
 }

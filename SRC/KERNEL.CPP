@@ -18,7 +18,7 @@ public:
 };
 unsigned A::lastId=0;
 void A::run(){
-	for (int i =0; i <5; i++) {
+	for (int i =0; i <8; i++) {
 		lock;
 		cout<<"u a"<< id <<"() i = "<<i<<endl;
 		unlock;
@@ -30,9 +30,9 @@ void A::run(){
 int userMain(int argc, char*argv[]){
 	lock;
 	cout<<"Pokrece se main\n";
-	A thA[10];
+	A thA[3];
 
-	for(int j=0;j<10;j++)
+	for(int j=0;j<3;j++)
 		thA[j].start();
 
 	unlock;

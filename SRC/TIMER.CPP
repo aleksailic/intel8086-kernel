@@ -14,6 +14,7 @@ volatile int tcount=2;
 static unsigned tsp;
 static unsigned tss;
 static unsigned tbp;
+static PCB* wakeMe=0;
 
 SleepList sl;
 
@@ -37,17 +38,15 @@ void interrupt timer(){	// prekidna rutina
 		//cout<<"OLD ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
 		//asm cli;
 
-
-		/*if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT))
+		if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT))
 			sl.update();
-		if(!CHK_RFLAG(PCB_SLEEPING))
+		if(CHK_RFLAG(PCB_SLEEPING))
 			sl.add(PCB::running);
 
-		PCB* wakeMe;
 		while(wakeMe=sl.getReady()){
 			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
 			Scheduler::put(wakeMe);
-		}*/
+		}
 
 		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING))
 			Scheduler::put((PCB*)PCB::running);
