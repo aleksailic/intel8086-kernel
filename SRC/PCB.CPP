@@ -26,6 +26,7 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
 
 		sp=FP_OFF(stack + 1012);
 		ss=FP_SEG(stack + 1012);
+		bp=FP_OFF(stack + 1012);
 
 		this->quant=quant;
 		this->flags=(flags == 0 ? (quant == 0 ? PCB_UNLIMITED : 0 ) : flags);

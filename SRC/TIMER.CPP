@@ -17,6 +17,7 @@ static unsigned tbp;
 
 void interrupt timer(){	// prekidna rutina
 	cout<<"TIMER: " << timer_count<< '\n';
+	asm cli;
 	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
 	if (timer_count == 0 || (timer_flags & TIMER_CHANGE_CONTEXT)) {
 		//cuvamo sp
@@ -32,11 +33,12 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->flags |= PCB_BLOCKED;
 
 		if(!(PCB::running->flags & PCB_FINISHED))
-			Scheduler::put(PCB::running);
+			Scheduler::put((PCB*)PCB::running);
 		PCB::running=Scheduler::get();
-		PCB::running->flags=PCB_RUNNING;
+		SET_STATUS_FLAGS(PCB::running->flags,PCB_RUNNING);
 
 		cout<<"NEW RUNNING ID: "<<PCB::running->id<<'\n';
+		asm cli;
 
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;
