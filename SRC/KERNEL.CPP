@@ -13,7 +13,7 @@ class A: public Thread{
 	void run();
 };
 void A::run(){
-	for (int i =0; i < 30; ++i) {
+	for (int i =0; i <30; i++) {
 		lock;
 		cout<<"u a() i = "<<i<<endl;
 		unlock;

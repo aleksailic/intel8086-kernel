@@ -29,10 +29,11 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
-		PCB::running->flags=PCB_BLOCKED;
+		PCB::running->flags |= PCB_BLOCKED;
 
-		Scheduler::put(PCB::running);
-		PCB::running= Scheduler::get();
+		if(!(PCB::running->flags & PCB_FINISHED))
+			Scheduler::put(PCB::running);
+		PCB::running=Scheduler::get();
 		PCB::running->flags=PCB_RUNNING;
 
 		cout<<"NEW RUNNING ID: "<<PCB::running->id<<'\n';

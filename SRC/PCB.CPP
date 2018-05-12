@@ -39,8 +39,8 @@ unsigned PCB::idCount=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
-	//nakon sto se zavrsio run dispatchujemo
 	running->flags = PCB_FINISHED;
+	//nakon sto se zavrsio run dispatchujemo
 	dispatch();
 }
 
