@@ -10,14 +10,24 @@
 #define PCB_H_
 
 #define MASK(n,off) (1u<<(n+off)-1) & (~0<<off)
-#define SET_STATUS_FLAGS(flags,n) flags = (flags & (~15)) + n
+
+#define CLR_RFLAG(f) PCB::running->flags &= ~f
+#define CHK_RFLAG(f) (PCB::running->flags & f)
+#define SET_RFLAG(f) PCB::running->flags |= f
+#define SET_STATUS_RFLAG(f) PCB::running->flags = (PCB::running->flags & (~15)) + f
+
+#define CLR_FLAG(var,f) var &= ~f
+#define CHK_FLAG(var,f) (var & f)
+#define SET_FLAG(var,f) var |= f
+#define SET_STATUS_FLAG(var,f) var = (var & (~15)) + f
 
 #include "THREAD.H"
 
 enum{
 	PCB_RUNNING = 0x1,
 	PCB_BLOCKED = 0x2,
-	PCB_FINISHED = 0x4,
+	PCB_SLEEPING = 0x4,
+	PCB_FINISHED = 0x8,
 	PCB_UNLIMITED = 0x10,
 	PCB_STACKLESS = 0x20,
 	PCB_THREADLESS = 0x40
@@ -34,6 +44,7 @@ public:
 	unsigned* stack;
 	unsigned id;
 	Time quant;
+	Time toSleep;
 
 	Thread* myThread;
 

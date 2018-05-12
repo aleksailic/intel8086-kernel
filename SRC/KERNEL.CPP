@@ -10,42 +10,34 @@
 #define unlock asm sti
 
 class A: public Thread{
+	static unsigned lastId;
+	unsigned id;
 	void run();
+public:
+	A():Thread(1024,5){ id=lastId++; }
 };
+unsigned A::lastId=0;
 void A::run(){
-	for (int i =0; i <30; i++) {
+	for (int i =0; i <5; i++) {
 		lock;
-		cout<<"u a() i = "<<i<<endl;
+		cout<<"u a"<< id <<"() i = "<<i<<endl;
 		unlock;
 		for (int k = 0; k<10000; ++k)
 			for (int j = 0; j <30000; ++j);
 	}
 }
-class B: public Thread{
-	void run();
-};
-void B::run(){
-	for (int i =0; i < 30; ++i) {
-		lock;
-		cout<<"u b() i = "<<i<<endl;
-		unlock;
-		for (int k = 0; k<10000; ++k)
-			for (int j = 0; j <30000; ++j);
-	}
-}
-
 
 int userMain(int argc, char*argv[]){
 	lock;
 	cout<<"Pokrece se main\n";
-	A thA;
-	B thB;
+	A thA[10];
 
-	thA.start();
-	thB.start();
+	for(int j=0;j<10;j++)
+		thA[j].start();
+
 	unlock;
 
-	for(int i=0;i<30;i++){
+	for(int i=0;i<50;i++){
 		lock;
 		cout<<"main "<<i<<endl;
 		unlock;

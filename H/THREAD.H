@@ -11,7 +11,7 @@
 typedef unsigned long StackSize;
 const StackSize defaultStackSize = 4096;
 typedef unsigned int Time; //time, x55ms
-const Time defaultTimeSlice = 5; // default = 2*55ms
+const Time defaultTimeSlice = 2; // default = 2*55ms
 typedef int ID;
 
 class PCB;

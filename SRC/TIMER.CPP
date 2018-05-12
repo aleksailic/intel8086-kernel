@@ -8,18 +8,19 @@
 #include <IOSTREAM.H>
 #include "TIMER.H"
 
-volatile int timer_flags=0;
-volatile int timer_count=2;
+volatile int tflags=0;
+volatile int tcount=2;
 
 static unsigned tsp;
 static unsigned tss;
 static unsigned tbp;
 
+SleepList sl;
+
 void interrupt timer(){	// prekidna rutina
-	//cout<<"TIMER: " << timer_count<< '\n';
-	//asm cli;
-	if (!(timer_flags & TIMER_CHANGE_CONTEXT)) timer_count--;
-	if (timer_count == 0 || (timer_flags & TIMER_CHANGE_CONTEXT)) {
+	if (!CHK_TFLAG(TIMER_CHANGE_CONTEXT) && !CHK_RFLAG(PCB_UNLIMITED))
+		tcount--;
+	if ( (tcount == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(TIMER_CHANGE_CONTEXT)) {
 		//cuvamo sp
 		asm {
 			mov tsp, sp
@@ -30,21 +31,37 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
-		PCB::running->flags |= PCB_BLOCKED;
+		CLR_RFLAG(PCB_RUNNING);
+		SET_RFLAG(PCB_BLOCKED);
 
-		if(!(PCB::running->flags & PCB_FINISHED))
+		//cout<<"OLD ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
+		//asm cli;
+
+
+		/*if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT))
+			sl.update();
+		if(!CHK_RFLAG(PCB_SLEEPING))
+			sl.add(PCB::running);
+
+		PCB* wakeMe;
+		while(wakeMe=sl.getReady()){
+			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
+			Scheduler::put(wakeMe);
+		}*/
+
+		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING))
 			Scheduler::put((PCB*)PCB::running);
 		PCB::running=Scheduler::get();
-		SET_STATUS_FLAGS(PCB::running->flags,PCB_RUNNING);
 
-		cout<<"NEW RUNNING ID: "<<PCB::running->id<<'\n';
-		asm cli;
+		SET_STATUS_RFLAG(PCB_RUNNING); //brise ostale statusne stavlja onaj setovan
+		//cout<<"NEW ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
+		//asm cli;
 
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;
 		tbp = PCB::running->bp;
 
-		timer_count = PCB::running->quant;
+		tcount = PCB::running->quant;
 
 		// restore sp
 		asm {
@@ -54,10 +71,45 @@ void interrupt timer(){	// prekidna rutina
 		}
 	}
 	//Poziv stare prekidne rutine koju smo premestili na 60h
-	if(!(timer_flags & TIMER_CHANGE_CONTEXT))
+	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT))
 		asm int 60h;
 
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
-	timer_flags = timer_flags & (~TIMER_CHANGE_CONTEXT);
+	CLR_TFLAG(TIMER_CHANGE_CONTEXT);
+}
+
+
+SleepList::SleepList(){
+	head=0;
+}
+void SleepList::add(PCB* pcb){
+	PCB_w*el=new PCB_w(pcb);
+	PCB_w**itr=&head;
+	for (; *itr != 0; itr = &((*itr)->next)) {
+		if ((*itr)->pcb->toSleep >= el->pcb->toSleep) { //ako je vece situacija recimo 3-> [7 5 0 0]
+			(*itr)->pcb->toSleep -= el->pcb->toSleep;
+			break;
+		}else {//situacija manje 7-> [3 2 1 0 0]
+			el->pcb->toSleep -= (*itr)->pcb->toSleep;
+		}
+	}
+	el->next=*itr;
+	*itr=el;
+}
+void SleepList::update(){
+	if(head != 0 && head->pcb->toSleep !=0)
+		head->pcb->toSleep--;
+}
+PCB* SleepList::getReady(){
+	PCB* toReturn=0;
+	if(head){
+		if(head->pcb->toSleep == 0){
+			PCB_w *toDelete=head;
+			toReturn = head->pcb;
+			head=head->next;
+			delete toDelete; //cistimo memoriju, pcb se nece obrisati jer je pokazivac
+		}
+	}
+	return toReturn;
 }
 

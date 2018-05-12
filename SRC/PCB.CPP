@@ -40,7 +40,7 @@ unsigned PCB::lastId=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
-	running->flags = PCB_FINISHED;
+	SET_RFLAG(PCB_FINISHED);
 	//nakon sto se zavrsio run dispatchujemo
 	dispatch();
 }
