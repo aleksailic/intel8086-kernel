@@ -18,9 +18,10 @@ static unsigned tbp;
 static PCB* wakeMe=0;
 
 static SleepList sl;
+volatile timestamp sysruntime=0;
 
 void interrupt timer(){	// prekidna rutina
-	if (!tflags && !CHK_RFLAG(PCB_UNLIMITED)) //za bilo koji fleg
+	if (!tflags && !CHK_RFLAG(PCB_UNLIMITED))
 		tcount--;
 	//promena konteksta
 	if ( (tcount == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(TIMER_CHANGE_CONTEXT)) {
@@ -72,8 +73,11 @@ void interrupt timer(){	// prekidna rutina
 		}
 	}
 	//Poziv stare prekidne rutine koju smo premestili na 60h
-	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT))
+	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)){
+		sysruntime++;
 		asm int 60h;
+	}
+
 
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
 	CLR_TFLAG(TIMER_CHANGE_CONTEXT);

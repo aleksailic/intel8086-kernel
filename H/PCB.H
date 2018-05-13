@@ -52,7 +52,7 @@ public:
 	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags=0);
 	static PCB* running;
 	static void triggerRun();
-	static unsigned lastId;
+	static unsigned nextId;
 };
 
 #endif /* PCB_H_ */

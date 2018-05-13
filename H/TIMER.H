@@ -11,6 +11,8 @@
 #include "PCB.H"
 #include "SCHEDULE.H"
 
+typedef unsigned long timestamp;
+
 #define CHK_TFLAG(f) (tflags & f)
 #define CLR_TFLAG(f) tflags &= ~f
 #define SET_TFLAG(f) tflags |= f
@@ -20,6 +22,7 @@ enum{
 };
 extern volatile int tflags;
 extern volatile int tcount;
+extern volatile timestamp sysruntime;
 
 void interrupt timer();
 

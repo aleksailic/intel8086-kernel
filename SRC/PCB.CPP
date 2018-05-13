@@ -13,7 +13,7 @@ PCB::PCB(){
 	this->flags = PCB_STACKLESS | PCB_THREADLESS;
 	this->quant = defaultTimeSlice;
 	this->myThread = 0; //opasne igre!
-	this->id=PCB::lastId++;
+	this->id=PCB::nextId++;
 }
 
 PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
@@ -31,12 +31,12 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
 		this->quant=quant;
 		this->flags=(flags == 0 ? (quant == 0 ? PCB_UNLIMITED : 0 ) : flags);
 		this->myThread=thread;
-		this->id=PCB::lastId++;
+		this->id=PCB::nextId++;
 
 		cout<<"Kreiran PCB "<< this->id << "\n";
 }
-PCB* PCB::running=new PCB(); //Ne postoji nit ali mora postojati PCB
-unsigned PCB::lastId=0;
+PCB* PCB::running=new PCB(); //Glavni tok programa ima svoj PCB i id:0
+unsigned PCB::nextId=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
