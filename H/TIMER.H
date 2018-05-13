@@ -21,26 +21,6 @@ enum{
 extern volatile int tflags;
 extern volatile int tcount;
 
-//Specijalizovana lista za cekanje
-class SleepList{
-	struct PCB_w{
-		PCB*pcb;
-		PCB_w*next;
-		PCB_w(PCB* pcb){
-			this->pcb=pcb;
-			this->next=0;
-		}
-	};
-	PCB_w* head;
-public:
-	SleepList();
-	void add(PCB* pcb);
-	void update();
-	PCB* getReady(); //Vraca NULL ako nije gotov
-};
-
 void interrupt timer();
-
-extern SleepList sl;
 
 #endif /* TIMER_H_ */

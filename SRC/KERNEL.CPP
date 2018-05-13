@@ -5,6 +5,8 @@
 #include "UTILS.H"
 
 #include "PCB.H"
+#include "SLIST.H"
+#include <STDLIB.H>
 
 #define lock asm cli
 #define unlock asm sti
@@ -14,7 +16,7 @@ class A: public Thread{
 	unsigned id;
 	void run();
 public:
-	A():Thread(1024,5){ id=lastId++; }
+	A():Thread(1024,10){ id=lastId++; }
 };
 unsigned A::lastId=0;
 void A::run(){
@@ -30,9 +32,9 @@ void A::run(){
 int userMain(int argc, char*argv[]){
 	lock;
 	cout<<"Pokrece se main\n";
-	A thA[3];
+	A thA[4];
 
-	for(int j=0;j<3;j++)
+	for(int j=0;j<4;j++)
 		thA[j].start();
 
 	unlock;
