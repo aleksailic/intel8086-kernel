@@ -24,8 +24,7 @@ void A::run(){
 		lock;
 		cout<<"u a"<< id <<"() i = "<<i<<endl;
 		unlock;
-		for (int k = 0; k<10000; ++k)
-			for (int j = 0; j <30000; ++j);
+		Thread::sleep(rand() % 10);
 	}
 }
 
