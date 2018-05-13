@@ -36,7 +36,6 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
 		CLR_RFLAG(PCB_RUNNING);
-		SET_RFLAG(PCB_BLOCKED);
 
 		//cout<<"OLD ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
 		//asm cli;
@@ -51,7 +50,7 @@ void interrupt timer(){	// prekidna rutina
 		if(CHK_RFLAG(PCB_SLEEPING))
 			sl.add(PCB::running);
 
-		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING))
+		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING) && !CHK_RFLAG(PCB_BLOCKED))
 			Scheduler::put((PCB*)PCB::running);
 		PCB::running=Scheduler::get();
 

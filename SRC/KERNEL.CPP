@@ -43,7 +43,7 @@ int userMain(int argc, char*argv[]){
 		cout<<"main "<<i<<endl;
 		unlock;
 
-		Thread::sleep(5);
+		Thread::sleep(4);
 	}
 
 	cout<<"HAPPY END!";
