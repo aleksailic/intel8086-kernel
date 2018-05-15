@@ -22,7 +22,7 @@
 #define SET_STATUS_FLAG(var,f) var = (var & (~15)) + f
 
 #include "THREAD.H"
-
+#include "SEMAPHOR.H"
 enum{
 	PCB_RUNNING = 0x1,
 	PCB_BLOCKED = 0x2,
@@ -33,7 +33,6 @@ enum{
 	PCB_THREADLESS = 0x40,
 	PCB_NOP = 0x80
 };
-
 class PCB{
 public:
 	friend class Thread;
@@ -48,6 +47,7 @@ public:
 	Time toSleep;
 
 	Thread* myThread;
+	Semaphore finished;
 
 	PCB();
 	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags=0);

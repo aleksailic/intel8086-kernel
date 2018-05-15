@@ -5,12 +5,12 @@
  *      Author: OS1
  */
 
-#ifndef H_SEM_H_
-#define H_SEM_H_
+#ifndef H_KSEM_H_
+#define H_KSEM_H_
 
 #include "QUEUE.H"
 
-class Semaphore{
+class KernelSem{
 	int val;
 	int mutex;
 	Queue blocked;
@@ -19,10 +19,12 @@ class Semaphore{
 	inline void lock();
 	inline void unlock();
 public:
-	Semaphore(int initValue=0);
+	KernelSem(int initValue=0);
 	void signal();
-	void wait();
+	int wait(int toBlock=1);
+	inline int getVal()const;
+	int setVal(int value); //za neke debugging potrebe, generalno no-no
 };
 
 
-#endif /* H_SEM_H_ */
+#endif /* H_KSEM_H_ */

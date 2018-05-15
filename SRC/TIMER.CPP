@@ -26,6 +26,7 @@ volatile timestamp sysruntime=0;
 void interrupt timer(){	// prekidna rutina
 	if(!tflags){ //poziv preko prekida
 		tcount--;
+		sysruntime++;
 		//tick();
 		sl.update();
 		while(wakeMe=sl.getReady()){
@@ -47,9 +48,6 @@ void interrupt timer(){	// prekidna rutina
 		PCB::running->bp = tbp;
 		CLR_RFLAG(PCB_RUNNING);
 
-		//cout<<"OLD ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
-		//asm cli;
-
 		if(CHK_RFLAG(PCB_SLEEPING))
 			sl.add(PCB::running);
 
@@ -59,8 +57,6 @@ void interrupt timer(){	// prekidna rutina
 
 		if(PCB::running==0)
 			PCB::running=nop;
-
-
 
 		SET_STATUS_RFLAG(PCB_RUNNING); //brise ostale statusne stavlja samo running
 		//cout<<"NEW ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
@@ -80,12 +76,7 @@ void interrupt timer(){	// prekidna rutina
 		}
 	}
 	//Poziv stare prekidne rutine koju smo premestili na 60h
-	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)){
-		sysruntime++;
-		asm int 60h;
-	}
-
-
+	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)) asm int 60h;
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
 	CLR_TFLAG(TIMER_CHANGE_CONTEXT);
 }

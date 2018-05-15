@@ -5,47 +5,60 @@
  *      Author: OS1
  */
 
-#include "SEM.H"
+#include "KSEM.H"
 #include "PCB.H"
 #include "TIMER.H"
+#include <IOSTREAM.H>
 
 static unsigned tsp;
 static unsigned tss;
 static unsigned tbp;
 
-Semaphore::Semaphore(int initValue){
+KernelSem::KernelSem(int initValue){
 	val=initValue;
 	mutex=0;
 }
-void Semaphore::lock(){
+void KernelSem::lock(){
 	asm cli; //mask interrupts
 	while(mutex); //uposleno cekamo dok nega druga nit ima bravu, ovo je kratkog trajanja pa je opravdano
 	mutex=1;
 }
-void Semaphore::unlock(){
+void KernelSem::unlock(){
 	mutex=0;
 	asm sti; //unmask interrupts
 }
-void Semaphore::signal(){
+void KernelSem::signal(){
 	lock();
 	if(val++<0)
 		unblock();
 	unlock();
 }
-void Semaphore::wait(){
+int KernelSem::wait(int toBlock){
 	lock();
-	if(--val<0)
-		block();
+	if(--val<0){
+		if(toBlock) block();
+		else val++;
+	}
 	unlock();
+	return toBlock ? (val<=0 ? 1 : 0) : (val<=0 ? -1 : 0);
 }
-void Semaphore::block(){
+void KernelSem::block(){
 	blocked.put(PCB::running);
 	SET_RFLAG(PCB_BLOCKED);
 	SET_TFLAG(TIMER_CHANGE_CONTEXT);
+	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
 	timer();
 }
-void Semaphore::unblock(){
+void KernelSem::unblock(){
 	PCB* pcb = blocked.get();
 	if(pcb) //nepotrbno ali dok smo u "debugging" modu ok
 		Scheduler::put(pcb);
+}
+int KernelSem::getVal()const{
+	return val;
+}
+int KernelSem::setVal(int value){
+	lock();
+	val=value;
+	unlock();
 }

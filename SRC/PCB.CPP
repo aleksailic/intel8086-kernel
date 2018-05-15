@@ -6,17 +6,18 @@
  */
 
 #include "PCB.H"
+#include "SEMAPHOR.H"
 #include <DOS.H>
 #include <IOSTREAM.H>
 
-PCB::PCB(){
+PCB::PCB():finished(0){
 	this->flags = PCB_STACKLESS | PCB_THREADLESS;
 	this->quant = defaultTimeSlice;
 	this->myThread = 0; //opasne igre!
 	this->id=PCB::nextId++;
 }
 
-PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
+PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags):finished(0){
 		scap=stackCapacity;
 		stack=new unsigned[1024];
 
@@ -40,9 +41,11 @@ unsigned PCB::nextId=0;
 
 void PCB::triggerRun(){
 	running->myThread->run();
+	asm cli; // mere predostroznosti
+	running->finished.signal();
 	SET_RFLAG(PCB_FINISHED);
-	//nakon sto se zavrsio run dispatchujemo
 	dispatch();
+	asm sti;
 }
 
 static void loopAeterna(){

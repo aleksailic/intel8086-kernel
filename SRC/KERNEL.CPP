@@ -36,7 +36,7 @@ int userMain(int argc, char*argv[]){
 
 	unlock;
 
-	for(int i=0;i<20;i++){
+	for(int i=0;i<3;i++){
 		lock;
 		cout<<"main "<<i<<endl;
 		unlock;

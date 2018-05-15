@@ -20,7 +20,7 @@ void Thread::start(){
 
 void Thread::waitToComplete(){
 	//asm sti;
-	while(!CHK_FLAG(myPCB->flags,PCB_FINISHED));
+	myPCB->finished.wait(1); //block dem mothafuckas
 }
 
 Thread::~Thread(){
