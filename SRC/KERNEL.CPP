@@ -38,15 +38,14 @@ int userMain(int argc, char*argv[]){
 
 	unlock;
 
-	for(int i=0;i<50;i++){
+	for(int i=0;i<10;i++){
 		lock;
 		cout<<"main "<<i<<endl;
 		unlock;
 
 		Thread::sleep(4);
 	}
-
-	cout<<"HAPPY END!";
+	cout<<"EXIT MAIN!";
 	return 0;
 }
 
@@ -54,5 +53,6 @@ int main(int argc,char*argv[]){
 	changeTimerRoutine();
 	userMain(argc,argv);
 	restoreTimerRoutine();
+	cout<<"HAPPY END!";
 	return 0;
 }

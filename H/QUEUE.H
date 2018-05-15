@@ -17,8 +17,8 @@ class Queue{
 	unsigned rear;
 public:
 	Queue();
-	int empty();
-	int full();
+	inline int empty();
+	inline int full();
 	void put(PCB* pcb);
 	PCB* get();
 };

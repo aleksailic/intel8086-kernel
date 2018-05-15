@@ -19,14 +19,13 @@ void Thread::start(){
 }
 
 void Thread::waitToComplete(){
-	while(!CHK_FLAG(myPCB->flags,PCB_FINISHED)){ //ako nije zavrseno
-		//cekaj da se zavrsi: busy wait (ne)? interrupt (mozda + neki queue)? dogadjaji (bingo!)
-	}
+	//asm sti;
+	while(!CHK_FLAG(myPCB->flags,PCB_FINISHED));
 }
 
 Thread::~Thread(){
 	waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
-	//delete myPCB; //oslobadjamo prostor
+	delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
 }
 
 
