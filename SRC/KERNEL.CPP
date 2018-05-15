@@ -4,8 +4,6 @@
 #include "TIMER.H"
 #include "UTILS.H"
 
-#include "PCB.H"
-#include "SLIST.H"
 #include <STDLIB.H>
 
 #define lock asm cli
@@ -38,7 +36,7 @@ int userMain(int argc, char*argv[]){
 
 	unlock;
 
-	for(int i=0;i<10;i++){
+	for(int i=0;i<20;i++){
 		lock;
 		cout<<"main "<<i<<endl;
 		unlock;

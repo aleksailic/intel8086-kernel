@@ -30,7 +30,8 @@ enum{
 	PCB_FINISHED = 0x8,
 	PCB_UNLIMITED = 0x10,
 	PCB_STACKLESS = 0x20,
-	PCB_THREADLESS = 0x40
+	PCB_THREADLESS = 0x40,
+	PCB_NOP = 0x80
 };
 
 class PCB{
@@ -53,6 +54,8 @@ public:
 	static PCB* running;
 	static void triggerRun();
 	static unsigned nextId;
+	static PCB* createNOP();
 };
+
 
 #endif /* PCB_H_ */

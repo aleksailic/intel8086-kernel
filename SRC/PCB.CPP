@@ -33,7 +33,7 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags){
 		this->myThread=thread;
 		this->id=PCB::nextId++;
 
-		cout<<"Kreiran PCB "<< this->id << "\n";
+		//cout<<"Kreiran PCB "<< this->id << "\n";
 }
 PCB* PCB::running=new PCB(); //Glavni tok programa ima svoj PCB i id:0
 unsigned PCB::nextId=0;
@@ -44,5 +44,17 @@ void PCB::triggerRun(){
 	//nakon sto se zavrsio run dispatchujemo
 	dispatch();
 }
+
+static void loopAeterna(){
+	while(1);
+}
+
+PCB* PCB::createNOP(){
+	PCB*nop=new PCB(24,1,0,PCB_NOP);
+	nop->stack[nop->scap - 2]=FP_SEG(loopAeterna);
+	nop->stack[nop->scap - 3]=FP_OFF(loopAeterna);
+	return nop;
+}
+
 
 

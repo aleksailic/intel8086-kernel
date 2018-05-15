@@ -30,17 +30,12 @@ Thread::~Thread(){
 
 
 void Thread::sleep(Time toSleep){
-	if(PCB::running->id == 0){
-		timestamp endTime= toSleep+sysruntime;
-		while(sysruntime < endTime); //busy wait, opravdan jer se main stavlja u sleep samo u okolnostima kad nema drugih niti
-	}else{
-		asm cli;
-		PCB::running->toSleep=toSleep;
-		SET_FLAG(PCB::running->flags,PCB_SLEEPING);
-		SET_TFLAG(TIMER_CHANGE_CONTEXT);
-		timer();
-		asm sti;
-	}
+	asm cli;
+	PCB::running->toSleep=toSleep;
+	SET_FLAG(PCB::running->flags,PCB_SLEEPING);
+	SET_TFLAG(TIMER_CHANGE_CONTEXT);
+	timer();
+	asm sti;
 }
 
 void dispatch(){
@@ -49,3 +44,5 @@ void dispatch(){
 	timer(); //da li se PSW stavlja na stek je pitanje?
 	asm sti;
 }
+
+

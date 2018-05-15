@@ -15,14 +15,24 @@ volatile int tcount=2;
 static unsigned tsp;
 static unsigned tss;
 static unsigned tbp;
+
 static PCB* wakeMe=0;
+static PCB* nop=PCB::createNOP();
 
 static SleepList sl;
 volatile timestamp sysruntime=0;
 
+
 void interrupt timer(){	// prekidna rutina
-	if (!tflags && !CHK_RFLAG(PCB_UNLIMITED))
+	if(!tflags){ //poziv preko prekida
 		tcount--;
+		//tick();
+		sl.update();
+		while(wakeMe=sl.getReady()){
+			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
+			Scheduler::put(wakeMe);
+		}
+	}
 	//promena konteksta
 	if ( (tcount == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(TIMER_CHANGE_CONTEXT)) {
 		//cuvamo sp
@@ -40,19 +50,17 @@ void interrupt timer(){	// prekidna rutina
 		//cout<<"OLD ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
 		//asm cli;
 
-		if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)){
-			sl.update();
-			while(wakeMe=sl.getReady()){
-				CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
-				Scheduler::put(wakeMe);
-			}
-		}
 		if(CHK_RFLAG(PCB_SLEEPING))
 			sl.add(PCB::running);
 
-		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING) && !CHK_RFLAG(PCB_BLOCKED))
+		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING) && !CHK_RFLAG(PCB_BLOCKED) && !CHK_RFLAG(PCB_NOP))
 			Scheduler::put((PCB*)PCB::running);
 		PCB::running=Scheduler::get();
+
+		if(PCB::running==0)
+			PCB::running=nop;
+
+
 
 		SET_STATUS_RFLAG(PCB_RUNNING); //brise ostale statusne stavlja samo running
 		//cout<<"NEW ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
