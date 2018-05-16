@@ -9,10 +9,10 @@
 #define lock asm cli
 #define unlock asm sti
 
-
 int userMain(int argc, char*argv[]){
-	Test * midway = new TSemProdCons();
-	midway->run();
+	Test * test = new TSemProdCons();
+	test->run();
+	delete test;
 	return 0;
 }
 
