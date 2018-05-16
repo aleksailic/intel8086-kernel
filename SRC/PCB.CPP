@@ -42,7 +42,7 @@ unsigned PCB::nextId=0;
 void PCB::triggerRun(){
 	running->myThread->run();
 	asm cli; // mere predostroznosti
-	//running->finished.signal();
+	running->finished.signal();
 	SET_RFLAG(PCB_FINISHED);
 	dispatch();
 	asm sti;

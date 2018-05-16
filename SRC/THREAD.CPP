@@ -20,14 +20,13 @@ void Thread::start(){
 
 void Thread::waitToComplete(){
 	//asm sti;
-	while(!CHK_FLAG(myPCB->flags,PCB_FINISHED));
-	//myPCB->finished.wait(1); //block dem mothafuckas
+	myPCB->finished.wait(1); //block dem mothafuckas
 }
 
 Thread::~Thread(){
-	cout<<"BRISE SE: "<<myPCB->id;
-	waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
-	cout<<"ZAVRSEN: "<<myPCB->id;
+	//cout<<"BRISE SE: "<<myPCB->id;
+	//waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
+	//cout<<"ZAVRSEN: "<<myPCB->id;
 	delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
 }
 

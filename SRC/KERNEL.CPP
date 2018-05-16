@@ -12,30 +12,34 @@
 #define lock asm cli
 #define unlock asm sti
 
-#define N 10
 class BoundedBuffer: public Queue{
 	Semaphore mutex;
 	Semaphore itemAvail;
 	Semaphore spaceAvail;
-	int data[N];
-	int head,tail;
+	int data[10];
+	int front,rear;
 public:
-	BoundedBuffer():mutex(0),itemAvail(0),spaceAvail(N),head(0),tail(0){}
+	BoundedBuffer():mutex(1),itemAvail(0),spaceAvail(10){
+		front=rear=0;
+	}
 	void put(int elem){
 		spaceAvail.wait(1);
 		mutex.wait(1);
-		tail=(tail+1)%N;
-		data[head]=elem;
+		rear=(rear+1)%10;
+		data[rear]=elem;
+		cout<<"Stavio: "<<elem<<'\n';
 		itemAvail.signal();
 		mutex.signal();
 	}
 	int get(){
 		itemAvail.wait(1);
 		mutex.wait(1);
-		head=(head+1)%N;
-		return data[head];
+		front=(front+1)%10;
+		cout<<"Uzeo: "<<data[front]<<'\n';
 		spaceAvail.signal();
 		mutex.signal();
+		return data[front];
+
 	}
 };
 
@@ -56,24 +60,15 @@ public:
 void Producer::run(){
 	int iter=10;
 	for(int i=0;i<iter;i++){
-		//buf->put(elem);
-		lock;
-		cout<<"Stavio: "<<elem << endl;
-		unlock;
-		for (int z = 0; z< 30000; ++z)
-				for (int x = 0; x < 30000; ++x);
+		buf->put(elem);
+		Thread::sleep(rand() % 5);
 	}
 }
 void Consumer::run(){
 	int iter=10;
 	for(int j=0;j<iter;j++){
-		//elem=buf->get();
-		lock;
-		cout<<"Uzeo: "<<elem<<endl;
-		unlock;
-
-		for (int z = 0; z< 30000; ++z)
-				for (int k = 0; k < 30000; ++k);
+		elem=buf->get();
+		Thread::sleep(rand() % 10);
 	}
 }
 
@@ -91,7 +86,9 @@ int userMain(int argc, char*argv[]){
 
 	unlock;
 
-	int x=5;
+	producer1.waitToComplete();
+	producer2.waitToComplete();
+	consumer.waitToComplete();
 
 	return 0;
 }

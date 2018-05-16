@@ -43,13 +43,13 @@ void interrupt timer(){	// prekidna rutina
 			mov tbp, bp
 		}
 
-		cout<<"ctx(";
-		if(CHK_TFLAG(TIMER_CHANGE_CONTEXT))
-			cout<<tcount;
-		else
-			cout<<"ex";
-		cout<<"):"<<PCB::running->id;
-		asm cli;
+		//cout<<"ctx(";
+		//if(CHK_TFLAG(TIMER_CHANGE_CONTEXT))
+		//	cout<<"ex";
+		//else
+		//	cout<<tcount;
+		///cout<<"):"<<PCB::running->id;
+		//asm cli;
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
@@ -65,13 +65,10 @@ void interrupt timer(){	// prekidna rutina
 		if(PCB::running==0)
 			PCB::running=nop;
 
-		cout<<"-> "<<PCB::running->id<<"\n";
-		asm cli;
+		//cout<<"-> "<<PCB::running->id<<"\n";
+		//asm cli;
 
 		SET_STATUS_RFLAG(PCB_RUNNING); //brise ostale statusne stavlja samo running
-
-		//cout<<"NEW ID: "<<PCB::running->id<<" FLAGS: "<<PCB::running->flags<<'\n';
-		//asm cli;
 
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;
