@@ -19,14 +19,12 @@ void Thread::start(){
 }
 
 void Thread::waitToComplete(){
-	//asm sti;
-	myPCB->finished.wait(1); //block dem mothafuckas
+	myPCB->finished.wait(1);
 }
 
 Thread::~Thread(){
-	//cout<<"BRISE SE: "<<myPCB->id;
+	//Ne moze waitToComplete() da se pozove jer se brise vtable, pa run() ne moze da se zavrsi :(
 	//waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
-	//cout<<"ZAVRSEN: "<<myPCB->id;
 	delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
 }
 

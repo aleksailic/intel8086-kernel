@@ -50,29 +50,3 @@ void SleepList::print(){
  	}
 	cout<<'\n';
 }
-
-/*  --  testing examples here for possible future use  --
- 	PCB arr[10]; //array of 10 PCBS
-	SleepList sl;
-	for(int j=0;j<100;j++)
-		rand();
-	for(int i=0;i<10;i++){
-		arr[i].toSleep=rand()%10;
-		cout<<arr[i].toSleep<<' ';
-	}
-	cout<<'\n';
-	for(i=0;i<10;i++){
-		sl.add(&arr[i]);
-		sl.print();
-	}
-
-	PCB*pcb;
-	while(!sl.empty()){
-		cout<<"update\n";
-		sl.update();
-		sl.print();
-		while(pcb=sl.getReady()){
-			cout<<"get: "<<pcb->id<<'\n';
-		}
-	}
-*/
