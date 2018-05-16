@@ -60,37 +60,38 @@ void Producer::run(){
 		lock;
 		cout<<"Stavio: "<<elem << endl;
 		unlock;
-		Thread::sleep(rand()%4);
+		for (int z = 0; z< 30000; ++z)
+				for (int x = 0; x < 30000; ++x);
 	}
 }
 void Consumer::run(){
 	int iter=10;
-	for(int i=0;i<iter;i++){
-		Thread::sleep(rand()%4);
-		elem=buf->get();
+	for(int j=0;j<iter;j++){
+		//elem=buf->get();
 		lock;
-		cout<<"Uzeo: "<<elem << endl;
+		cout<<"Uzeo: "<<elem<<endl;
 		unlock;
+
+		for (int z = 0; z< 30000; ++z)
+				for (int k = 0; k < 30000; ++k);
 	}
 }
 
 int userMain(int argc, char*argv[]){
 	lock;
-	cout<<"Pokrece se main\n";
-
-
 	BoundedBuffer buffer;
 
 	Producer producer1(&buffer,4);
 	Producer producer2(&buffer,6);
-	//Consumer consumer(&buffer);
+	Consumer consumer(&buffer);
 
 	producer1.start();
 	producer2.start();
-	//consumer.start();
-
+	consumer.start();
 
 	unlock;
+
+	int x=5;
 
 	return 0;
 }
