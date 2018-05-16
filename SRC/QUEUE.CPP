@@ -7,18 +7,18 @@
 
 #include "QUEUE.H"
 
-Queue::Queue(){
-	front=rear=0;
+Queue::Queue(unsigned capacity):cap(capacity),front(0),rear(0){
+	data=new PCB*[capacity];
 }
 void Queue::put(PCB* pcb){
-	rear=(rear+1) % MAX_QUEUE;
+	rear=(rear+1) % cap;
 	if(!full()){
 		data[rear]=pcb;
 	}
 }
 PCB* Queue::get(){
 	if(!empty()){
-		front=(front+1) % MAX_QUEUE;
+		front=(front+1) % cap;
 		return data[front];
 	}
 	return 0;

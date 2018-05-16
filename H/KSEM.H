@@ -8,12 +8,12 @@
 #ifndef H_KSEM_H_
 #define H_KSEM_H_
 
-#include "QUEUE.H"
+#include "FLIST.H"
 
 class KernelSem{
 	int val;
 	int mutex;
-	Queue blocked;
+	FList blocked;
 	inline void block();
 	inline void unblock();
 	inline void lock();

@@ -10,10 +10,6 @@
 #include "TIMER.H"
 #include <IOSTREAM.H>
 
-static unsigned tsp;
-static unsigned tss;
-static unsigned tbp;
-
 KernelSem::KernelSem(int initValue){
 	val=initValue;
 	mutex=0;
@@ -44,7 +40,7 @@ int KernelSem::wait(int toBlock){
 }
 void KernelSem::block(){
 	cout<<"sem blocking: "<<PCB::running->id<<endl;
-	blocked.put(PCB::running);
+	blocked.add(PCB::running);
 	SET_RFLAG(PCB_BLOCKED);
 	SET_TFLAG(TIMER_CHANGE_CONTEXT);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
@@ -53,6 +49,7 @@ void KernelSem::block(){
 void KernelSem::unblock(){
 	PCB* pcb = blocked.get();
 	cout<<"sem unblocking: "<<pcb->id<<endl;
+	CLR_FLAG(pcb->flags,PCB_BLOCKED);
 	if(pcb) //nepotrbno ali dok smo u "debugging" modu ok
 		Scheduler::put(pcb);
 }

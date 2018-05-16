@@ -8,15 +8,13 @@
 #ifndef H_QUEUE_H_
 #define H_QUEUE_H_
 
-const int MAX_QUEUE = 10;
 
 class PCB;
 class Queue{
-	PCB* data[MAX_QUEUE]; //to je u startu alokacija od 20B
-	unsigned front;
-	unsigned rear;
+	PCB** data; //to je u startu alokacija od 20B
+	unsigned front,rear,cap;
 public:
-	Queue();
+	Queue(unsigned capacity);
 	inline int empty();
 	inline int full();
 	void put(PCB* pcb);

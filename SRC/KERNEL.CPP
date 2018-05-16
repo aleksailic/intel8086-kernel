@@ -6,12 +6,14 @@
 #include "TEST.H"
 #include "T_SEMPC.H"
 #include "T_FLIST.H"
+#include "T_LAB.H"
+#include "T_SLIST.H"
 
 #define lock asm cli
 #define unlock asm sti
 
 int userMain(int argc, char*argv[]){
-	Test * test = new TFList();
+	Test * test = new TSemProdCons();
 	test->run();
 	delete test;
 	return 0;
