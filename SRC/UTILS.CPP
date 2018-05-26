@@ -4,12 +4,12 @@
  *  Created on: May 16, 2018
  *      Author: OS1
  */
-
-
 #include "UTILS.H"
+#include "IVTENTRY.H"
 
 static unsigned oldTimerSEG,oldTimerOFF;
 void changeTimerRoutine(){
+
 	asm{
 		cli
 		push es

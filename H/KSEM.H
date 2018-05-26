@@ -23,7 +23,7 @@ public:
 	void signal();
 	int wait(int toBlock=1);
 	inline int getVal()const;
-	int setVal(int value); //za neke debugging potrebe, generalno no-no
+	void setVal(int value); //za neke debugging potrebe, generalno no-no
 };
 
 

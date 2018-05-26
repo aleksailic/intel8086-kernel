@@ -22,7 +22,6 @@ static PCB* nop=PCB::createNOP();
 static SleepList sl;
 volatile timestamp sysruntime=0;
 
-
 void interrupt timer(){	// prekidna rutina
 	if(!tflags){ //poziv preko prekida
 		tcount--;

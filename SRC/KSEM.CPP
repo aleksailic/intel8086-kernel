@@ -56,7 +56,7 @@ void KernelSem::unblock(){
 int KernelSem::getVal()const{
 	return val;
 }
-int KernelSem::setVal(int value){
+void KernelSem::setVal(int value){
 	lock();
 	val=value;
 	unlock();

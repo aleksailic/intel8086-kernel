@@ -13,7 +13,7 @@
 #define unlock asm sti
 
 int userMain(int argc, char*argv[]){
-	Test * test = new TSemProdCons();
+	Test * test = new TLab();
 	test->run();
 	delete test;
 	return 0;
