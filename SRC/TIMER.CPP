@@ -22,11 +22,13 @@ static PCB* nop=PCB::createNOP();
 static SleepList sl;
 volatile timestamp sysruntime=0;
 
+extern void tick();
+
 void interrupt timer(){	// prekidna rutina
-	if(!tflags){ //poziv preko prekida
+	if(!tflags){ //nije poziv preko prekida
 		tcount--;
 		sysruntime++;
-		//tick();
+		tick();
 		sl.update();
 		while(wakeMe=sl.getReady()){
 			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);

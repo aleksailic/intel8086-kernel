@@ -32,9 +32,9 @@ public:
 
 #define PREPAREENTRY(numEntry,oldCall) \
 	void interrupt inter##numEntry(...){ \
-		IVTEntry::data[##numEntry]->signal(); \
+		IVTEntry::data[numEntry]->signal(); \
 		if(oldCall==1)\
-			IVTEntry::data[##numEntry]->callOld(); \
+			IVTEntry::data[numEntry]->callOld(); \
 	} \
 	IVTEntry* entry##numEntry=new IVTEntry(numEntry,inter##numEntry); \
 

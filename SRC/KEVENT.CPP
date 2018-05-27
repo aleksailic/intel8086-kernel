@@ -29,14 +29,14 @@ void KernelEv::signal(){
 	unlock();
 }
 void KernelEv::block(){
-	cout<<"ev blocking: "<<PCB::running->id<<endl;
+	//cout<<"ev blocking: "<<PCB::running->id<<endl;
 	SET_RFLAG(PCB_BLOCKED);
 	SET_TFLAG(TIMER_CHANGE_CONTEXT);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
 	timer();
 }
 void KernelEv::unblock(){
-	cout<<"ev unblock: "<<myPCB->id<<endl;
+	//cout<<"ev unblock: "<<myPCB->id<<endl;
 	CLR_FLAG(myPCB->flags,PCB_BLOCKED);
 	Scheduler::put(myPCB);
 }

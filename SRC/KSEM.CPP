@@ -39,7 +39,7 @@ int KernelSem::wait(int toBlock){
 	return toBlock ? (val<=0 ? 1 : 0) : (val<=0 ? -1 : 0);
 }
 void KernelSem::block(){
-	cout<<"sem blocking: "<<PCB::running->id<<endl;
+	//cout<<"sem blocking: "<<PCB::running->id<<endl;
 	blocked.add(PCB::running);
 	SET_RFLAG(PCB_BLOCKED);
 	SET_TFLAG(TIMER_CHANGE_CONTEXT);
@@ -48,7 +48,7 @@ void KernelSem::block(){
 }
 void KernelSem::unblock(){
 	PCB* pcb = blocked.get();
-	cout<<"sem unblocking: "<<pcb->id<<endl;
+	//cout<<"sem unblocking: "<<pcb->id<<endl;
 	CLR_FLAG(pcb->flags,PCB_BLOCKED);
 	if(pcb) //nepotrbno ali dok smo u "debugging" modu ok
 		Scheduler::put(pcb);
