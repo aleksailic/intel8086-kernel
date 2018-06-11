@@ -49,7 +49,7 @@ void KernelSem::block(){
 void KernelSem::unblock(){
 	PCB* pcb = blocked.get();
 	//cout<<"sem unblocking: "<<pcb->id<<endl;
-	CLR_FLAG(pcb->flags,PCB_BLOCKED);
+	CLR_FLAG(pcb,PCB_BLOCKED);
 	if(pcb) //nepotrbno ali dok smo u "debugging" modu ok
 		Scheduler::put(pcb);
 }

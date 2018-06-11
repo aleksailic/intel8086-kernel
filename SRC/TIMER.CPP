@@ -48,7 +48,7 @@ void interrupt Timer::routine(...){
 		//tick();
 		sl.update();
 		while(wakeMe=sl.getReady()){
-			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
+			CLR_FLAG(wakeMe,PCB_SLEEPING);
 			Scheduler::put(wakeMe);
 		}
 	}

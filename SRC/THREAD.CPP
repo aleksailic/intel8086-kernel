@@ -32,7 +32,7 @@ Thread::~Thread(){
 void Thread::sleep(Time toSleep){
 	asm cli;
 	PCB::running->toSleep=toSleep;
-	SET_FLAG(PCB::running->flags,PCB_SLEEPING);
+	SET_RFLAG(PCB_SLEEPING);
 	SET_TFLAG(Timer::CHANGE_CONTEXT);
 	Timer::routine();
 	asm sti;
