@@ -6,18 +6,22 @@
  */
 
 #include "PCB.H"
-#include "SEMAPHOR.H"
 #include <DOS.H>
 #include <IOSTREAM.H>
 
-PCB::PCB():finished(0){
-	this->flags = PCB_STACKLESS | PCB_THREADLESS;
-	this->quant = defaultTimeSlice;
-	this->myThread = 0; //opasne igre!
-	this->id=PCB::nextId++;
-}
 
-PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags):finished(0){
+PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id):finished(0){
+	this->id= (id<0 ? PCB::nextId++ : id);
+	this->myThread=thread;
+	this->flags=flags;
+	this->quant=quant;
+	if(!thread)
+		SET_FLAG(this,PCB_THREADLESS);
+	if(!quant)
+		SET_FLAG(this,PCB_UNLIMITED);
+	if(!stackCapacity)
+		SET_FLAG(this,PCB_STACKLESS);
+	else{
 		scap=stackCapacity;
 		stack=new unsigned[1024];
 
@@ -28,16 +32,11 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags):finis
 		sp=FP_OFF(stack + stackCapacity - 12);
 		ss=FP_SEG(stack + stackCapacity - 12);
 		bp=FP_OFF(stack + stackCapacity - 12);
-
-		this->quant=quant;
-		this->flags=(flags == 0 ? (quant == 0 ? PCB_UNLIMITED : 0 ) : flags);
-		this->myThread=thread;
-		this->id=PCB::nextId++;
-
-		//cout<<"Kreiran PCB "<< this->id << "\n";
+	}
+	//cout<<"Kreiran PCB "<< this->id << "\n";
 }
-PCB* PCB::running=new PCB(); //Glavni tok programa ima svoj PCB i id:0
-unsigned PCB::nextId=0;
+PCB* PCB::running=new PCB(0,defaultTimeSlice,0,PCB_RUNNING,1); //Glavni tok programa ima svoj PCB i id:0
+unsigned PCB::nextId=2;
 
 void PCB::triggerRun(){
 	running->myThread->run();

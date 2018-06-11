@@ -19,7 +19,7 @@ class KernelSem{
 	inline void lock();
 	inline void unlock();
 public:
-	KernelSem(int initValue=0);
+	KernelSem(int initValue=1);
 	void signal();
 	int wait(int toBlock=1);
 	inline int getVal()const;

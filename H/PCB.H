@@ -22,7 +22,7 @@
 #define SET_STATUS_RFLAG(f) SET_STATUS_FLAG(PCB::running,f)
 
 #include "THREAD.H"
-#include "SEMAPHOR.H"
+#include "KSEM.H"
 enum{
 //  -  Status flags  -
 	PCB_RUNNING = 0x1,
@@ -52,10 +52,10 @@ public:
 	Time toSleep;
 
 	Thread* myThread;
-	Semaphore finished;
+	KernelSem finished;
 
-	PCB();
-	PCB(StackSize stackCapacity, Time quant,Thread* thread, unsigned flags=0);
+	PCB(StackSize stackCapacity=0,Time quant=defaultTimeSlice,Thread* thread=0,unsigned flags=0,int id=-1);
+
 	static PCB* running;
 	static void triggerRun();
 	static unsigned nextId;
