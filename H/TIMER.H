@@ -28,14 +28,25 @@ class Timer{
 
 	static void changeRoutine();
 	static void restoreRoutine();
+	static void interrupt routine(...);
+	Timer();
 public:
 	static volatile int flags;
 	enum{
 		CHANGE_CONTEXT = 0x1
 	};
 	static void create();
-	static void interrupt routine(...);
 	static void destroy();
+	static inline void changeContext();
+};
+
+class Lock{
+	static unsigned char val;
+	Lock();
+public:
+	static void set();
+	static void unset();
+	static unsigned char isSet(); //ne postoji bool
 };
 
 

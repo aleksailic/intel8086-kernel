@@ -12,7 +12,7 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 
-#define TH_COUNT 4
+#define TH_COUNT 30
 #define TH_NUM 8
 #define MAIN_NUM 3
 

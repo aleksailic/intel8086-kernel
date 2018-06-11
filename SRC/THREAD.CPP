@@ -33,15 +33,13 @@ void Thread::sleep(Time toSleep){
 	asm cli;
 	PCB::running->toSleep=toSleep;
 	SET_RFLAG(PCB_SLEEPING);
-	SET_TFLAG(Timer::CHANGE_CONTEXT);
-	Timer::routine();
+	Timer::changeContext();
 	asm sti;
 }
 
 void dispatch(){
 	asm cli;
-	SET_TFLAG(Timer::CHANGE_CONTEXT);
-	Timer::routine(); //da li se PSW stavlja na stek je pitanje? -Da, to radi kljucna rec interrupt
+	Timer::changeContext(); //da li se PSW stavlja na stek je pitanje? -Da, to radi kljucna rec interrupt
 	asm sti;
 }
 

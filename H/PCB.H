@@ -32,9 +32,11 @@ enum{
 //  ------------------
 
 	PCB_UNLIMITED = 0x10,
-	PCB_STACKLESS = 0x20,
+	PCB_KERNEL = 0x20,
 	PCB_THREADLESS = 0x40,
-	PCB_NOP = 0x80
+	PCB_NOP = 0x80,
+
+	PCB_STACKLESS = 0x100
 };
 class PCB{
 public:

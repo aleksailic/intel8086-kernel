@@ -42,9 +42,8 @@ void KernelSem::block(){
 	//cout<<"sem blocking: "<<PCB::running->id<<endl;
 	blocked.add(PCB::running);
 	SET_RFLAG(PCB_BLOCKED);
-	SET_TFLAG(Timer::CHANGE_CONTEXT);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
-	Timer::routine();
+	Timer::changeContext();
 }
 void KernelSem::unblock(){
 	PCB* pcb = blocked.get();

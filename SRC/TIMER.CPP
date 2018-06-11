@@ -37,6 +37,10 @@ void Timer::create(){
 void Timer::destroy(){
 	restoreRoutine();
 }
+void Timer::changeContext(){
+	SET_TFLAG(CHANGE_CONTEXT);
+	routine();
+}
 
 volatile int Timer::flags=0;
 volatile int Timer::count=2; //defaultTimeSlice
@@ -52,7 +56,7 @@ void interrupt Timer::routine(...){
 			Scheduler::put(wakeMe);
 		}
 	}
-	if ( (Timer::count == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(CHANGE_CONTEXT)) {
+	if ( !Lock::isSet() && ((Timer::count == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(CHANGE_CONTEXT))) {
 		//cuvamo sp
 		asm {
 			mov tsp, sp
@@ -108,4 +112,15 @@ void interrupt Timer::routine(...){
 	if(!CHK_TFLAG(CHANGE_CONTEXT)) oldRoutine();
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
 	CLR_TFLAG(CHANGE_CONTEXT);
+}
+
+unsigned char Lock::val=0;
+void Lock::set(){
+	val=1;
+}
+void Lock::unset(){
+	val=0;
+}
+unsigned char Lock::isSet(){
+	return val;
 }
