@@ -31,9 +31,9 @@ void KernelEv::signal(){
 void KernelEv::block(){
 	//cout<<"ev blocking: "<<PCB::running->id<<endl;
 	SET_RFLAG(PCB_BLOCKED);
-	SET_TFLAG(TIMER_CHANGE_CONTEXT);
+	SET_TFLAG(Timer::CHANGE_CONTEXT);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
-	timer();
+	Timer::routine();
 }
 void KernelEv::unblock(){
 	//cout<<"ev unblock: "<<myPCB->id<<endl;

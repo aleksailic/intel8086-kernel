@@ -12,10 +12,14 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 
+#define TH_COUNT 4
+#define TH_NUM 8
+#define MAIN_NUM 3
+
 TLab::A::A():Thread(1024,10){id=lastId++;}
 unsigned TLab::A::lastId=0;
 void TLab::A::run(){
-	for (int i =0; i <8; i++) {
+	for (int i =0; i <TH_NUM; i++) {
 		asm cli;
 		cout<<"u a"<< id <<"() i = "<<i<<endl;
 		asm sti;
@@ -27,12 +31,12 @@ void TLab::run(){
 	asm cli;
 	cout<<"Pokrece se main\n";
 	asm sti;
-	A thA[4];
+	A thA[TH_COUNT];
 
-	for(int j=0;j<4;j++)
+	for(int j=0;j<TH_COUNT;j++)
 		thA[j].start();
 
-	for(int i=0;i<3;i++){
+	for(int i=0;i<MAIN_NUM;i++){
 		asm cli;
 		cout<<"main "<<i<<endl;
 		asm sti;
