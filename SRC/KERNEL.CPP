@@ -1,7 +1,7 @@
 #include <IOSTREAM.H>
 #include <DOS.H>
 
-#include "UTILS.H"
+#include "TIMER.H"
 
 #include "TEST.H"
 #include "T_SEMPC.H"
@@ -9,21 +9,18 @@
 #include "T_LAB.H"
 #include "T_SLIST.H"
 
-#define lock asm cli
-#define unlock asm sti
-
-extern int userMain(int argc,char*argv[]);
-/*int userMain(int argc, char*argv[]){
-	Test * test = new TSemProdCons();
+//extern int userMain(int argc,char*argv[]);
+int userMain(int argc, char*argv[]){
+	Test * test = new TLab();
 	test->run();
 	delete test;
 	return 0;
-}*/
+}
 
 int main(int argc,char*argv[]){
-	changeTimerRoutine();
+	Timer::create();
 	userMain(argc,argv);
-	restoreTimerRoutine();
+	Timer::destroy();
 	cout<<"HAPPY END!";
 	return 0;
 }

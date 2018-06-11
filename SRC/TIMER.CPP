@@ -6,11 +6,9 @@
  */
 
 #include <IOSTREAM.H>
+#include <DOS.H>
 #include "TIMER.H"
 #include "SLIST.H"
-
-volatile int tflags=0;
-volatile int tcount=2;
 
 static unsigned tsp;
 static unsigned tss;
@@ -24,26 +22,43 @@ volatile timestamp sysruntime=0;
 
 extern void tick();
 
-void interrupt timer(){	// prekidna rutina
-	if(!tflags){ //nije poziv preko prekida
-		tcount--;
+const int Timer::routineNo = 0x8;
+pInterrupt Timer::oldRoutine=0;
+void Timer::changeRoutine(){
+	oldRoutine = getvect(routineNo);
+	setvect(routineNo, routine);
+}
+void Timer::restoreRoutine(){
+	setvect(routineNo,oldRoutine);
+}
+void Timer::create(){
+	changeRoutine();
+}
+void Timer::destroy(){
+	restoreRoutine();
+}
+
+volatile int Timer::flags=0;
+volatile int Timer::count=2; //defaultTimeSlice
+
+void interrupt Timer::routine(...){
+	if(!Timer::flags){ //nema eksplicitnog poziva
+		Timer::count--;
 		sysruntime++;
-		tick();
+		//tick();
 		sl.update();
 		while(wakeMe=sl.getReady()){
-			CLR_FLAG(wakeMe->flags,PCB_SLEEPING);
+			CLR_FLAG(wakeMe,PCB_SLEEPING);
 			Scheduler::put(wakeMe);
 		}
 	}
-	//promena konteksta
-	if ( (tcount == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(TIMER_CHANGE_CONTEXT)) {
+	if ( (Timer::count == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(CHANGE_CONTEXT)) {
 		//cuvamo sp
 		asm {
 			mov tsp, sp
 			mov tss, ss
 			mov tbp, bp
 		}
-
 		/*
 		cout<<"ctx(";
 		if(CHK_TFLAG(TIMER_CHANGE_CONTEXT))
@@ -80,7 +95,7 @@ void interrupt timer(){	// prekidna rutina
 		tss = PCB::running->ss;
 		tbp = PCB::running->bp;
 
-		tcount = PCB::running->quant;
+		count = PCB::running->quant;
 
 		// restore sp
 		asm {
@@ -89,9 +104,8 @@ void interrupt timer(){	// prekidna rutina
 			mov bp, tbp
 		}
 	}
-	//Poziv stare prekidne rutine koju smo premestili na 60h
-	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)) asm int 60h;
+	//Poziv stare prekidne rutine
+	if(!CHK_TFLAG(CHANGE_CONTEXT)) oldRoutine();
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
-	CLR_TFLAG(TIMER_CHANGE_CONTEXT);
+	CLR_TFLAG(CHANGE_CONTEXT);
 }
-

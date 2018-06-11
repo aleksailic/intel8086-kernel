@@ -23,7 +23,7 @@ void KernelEv::wait(){
 }
 void KernelEv::signal(){
 	lock();
-	if(val==0 && CHK_FLAG(myPCB->flags,PCB_BLOCKED))
+	if(val==0 && CHK_FLAG(myPCB,PCB_BLOCKED))
 		unblock();
 	val=1;
 	unlock();
@@ -31,13 +31,13 @@ void KernelEv::signal(){
 void KernelEv::block(){
 	//cout<<"ev blocking: "<<PCB::running->id<<endl;
 	SET_RFLAG(PCB_BLOCKED);
-	SET_TFLAG(TIMER_CHANGE_CONTEXT);
+	SET_TFLAG(Timer::CHANGE_CONTEXT);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
-	timer();
+	Timer::routine();
 }
 void KernelEv::unblock(){
 	//cout<<"ev unblock: "<<myPCB->id<<endl;
-	CLR_FLAG(myPCB->flags,PCB_BLOCKED);
+	CLR_FLAG(myPCB,PCB_BLOCKED);
 	Scheduler::put(myPCB);
 }
 
