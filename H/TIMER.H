@@ -33,7 +33,9 @@ class Timer{
 public:
 	static volatile int flags;
 	enum{
-		CHANGE_CONTEXT = 0x1
+		CHANGE_CONTEXT = 0x1,
+		SET_KERNEL=0x2,
+		SET_SAVED=0x4
 	};
 	static void create();
 	static void destroy();

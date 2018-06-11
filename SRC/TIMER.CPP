@@ -45,6 +45,21 @@ void Timer::changeContext(){
 volatile int Timer::flags=0;
 volatile int Timer::count=2; //defaultTimeSlice
 
+//- Pomocni makroi za debagovanje rutine -
+#define PRINTOLD()\
+	cout<<"ctx(";\
+	if(CHK_TFLAG(CHANGE_CONTEXT))\
+		cout<<"ex";\
+	else\
+		cout<<count;\
+	cout<<"):"<<PCB::running->id;\
+	asm cli;
+
+#define PRINTNEW()\
+	cout<<"-> "<<PCB::running->id<<"\n";\
+	asm cli;
+//----------------------------------------
+
 void interrupt Timer::routine(...){
 	if(!Timer::flags){ //nema eksplicitnog poziva
 		Timer::count--;
@@ -63,15 +78,8 @@ void interrupt Timer::routine(...){
 			mov tss, ss
 			mov tbp, bp
 		}
-		/*
-		cout<<"ctx(";
-		if(CHK_TFLAG(TIMER_CHANGE_CONTEXT))
-			cout<<"ex";
-		else
-			cout<<tcount;
-		cout<<"):"<<PCB::running->id;
-		asm cli;
-		*/
+
+		//PRINTOLD()
 
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
@@ -88,10 +96,7 @@ void interrupt Timer::routine(...){
 		if(PCB::running==0)
 			PCB::running=nop;
 
-		/*
-		cout<<"-> "<<PCB::running->id<<"\n";
-		asm cli;
-		*/
+		//PRINTNEW()
 
 		SET_STATUS_RFLAG(PCB_RUNNING); //brise ostale statusne stavlja samo running
 
