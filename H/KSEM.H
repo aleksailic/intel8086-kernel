@@ -10,10 +10,11 @@
 
 #include "FLIST.H"
 
+class PCB;
 class KernelSem{
 	int val;
 	int mutex;
-	FList blocked;
+	FList<PCB> blocked;
 	inline void block();
 	inline void unblock();
 	inline void lock();

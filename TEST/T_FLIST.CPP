@@ -20,7 +20,7 @@ static const int SEED = 1005;
 
 void TFList::run(){
 	PCB arr[N];
-	FList fl;
+	FList<PCB> fl;
 	setSeed(SEED);
 	int index;
 	for(int i=0;i<N;i++){
@@ -34,7 +34,14 @@ void TFList::run(){
 			else
 				cout<<"prazna!\n";
 		}
-		fl.print();
+
+		for(int j=0;;j++){
+			PCB* el = fl.view(j);
+			if(el==0)
+				break;
+			cout<< "pcb"<<el->id<<"|";
+		}
+
 	}
 }
 
