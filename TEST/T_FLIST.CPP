@@ -35,12 +35,12 @@ void TFList::run(){
 				cout<<"prazna!\n";
 		}
 
-		for(int j=0;;j++){
+		/*for(int j=0;;j++){
 			PCB* el = fl.view(j);
 			if(el==0)
 				break;
 			cout<< "pcb"<<el->id<<"|";
-		}
+		}*/
 
 	}
 }

@@ -36,13 +36,14 @@ public:
 		delete toDelete;
 		return toReturn;
 	}
+	/*//Sluzi za test
 	T* view(int index){
 		T_w* itr=first;
 		for(int i=0; i++<index && itr!=0;itr=itr->next);
 		if(itr!=0)
 			return itr->el;
 		return 0;
-	}
+	}*/
 };
 
 #endif /* H_FLIST_H_ */
