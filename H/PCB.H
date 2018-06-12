@@ -54,7 +54,7 @@ public:
 	Thread* myThread;
 	KernelSem finished;
 
-	PCB(StackSize stackCapacity=0,Time quant=defaultTimeSlice,Thread* thread=0,unsigned flags=0,int id=-1);
+	PCB(StackSize stackCapacity=0,Time quant=defaultTimeSlice,Thread* thread=0,unsigned flags=0,int id=-1,void(*fn)()=PCB::triggerRun);
 
 	static PCB* running;
 	static void triggerRun();

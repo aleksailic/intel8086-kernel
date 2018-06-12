@@ -10,7 +10,7 @@
 #include <IOSTREAM.H>
 
 
-PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id):finished(0){
+PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id,void(*fn)()):finished(0){
 	this->id= (id<0 ? PCB::nextId++ : id);
 	this->myThread=thread;
 	this->flags=flags;
@@ -25,9 +25,9 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 		scap=stackCapacity;
 		stack=new unsigned[1024];
 
-		stack[stackCapacity-1]=0x200;
-		stack[stackCapacity-2]=FP_SEG(PCB::triggerRun);
-		stack[stackCapacity-3]=FP_OFF(PCB::triggerRun);
+		stack[stackCapacity-1]=0x200; //Interrupt is 1
+		stack[stackCapacity-2]=FP_SEG(fn);
+		stack[stackCapacity-3]=FP_OFF(fn);
 
 		sp=FP_OFF(stack + stackCapacity - 12);
 		ss=FP_SEG(stack + stackCapacity - 12);

@@ -7,6 +7,7 @@
 
 #include "SYS.H"
 #include "TIMER.H"
+#include "KTHREAD.H"
 #include <DOS.H>
 
 static unsigned tcx;
@@ -20,8 +21,8 @@ static unsigned tdx;
 	asm push dx;\
 	asm mov cx, tcx;\
 	asm mov dx, tdx;\
-	SET_TFLAG(Timer::SET_KERNEL);\
-	Timer::changeContext();\
+	SET_KTASK(SET_KERNEL);\
+	asm int 60h;\
 	asm pop dx;\
 	asm pop cx;
 

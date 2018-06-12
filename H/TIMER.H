@@ -18,8 +18,32 @@ typedef void interrupt (*pInterrupt)(...);
 #define CLR_TFLAG(f) Timer::flags &= ~f
 #define SET_TFLAG(f) Timer::flags |= f
 
-extern volatile timestamp sysruntime;
+extern unsigned tsp;
+extern unsigned tss;
+extern unsigned tbp;
+extern unsigned tcx;
+extern unsigned tdx;
 
+#define STORE_REGS(pcb)\
+	asm mov tsp, sp;\
+	asm mov tss, ss;\
+	asm mov tbp, bp;\
+	pcb->sp = tsp;\
+	pcb->ss = tss;\
+	pcb->bp = tbp
+#define RESTORE_REGS(pcb)\
+	tsp = pcb->sp;\
+	tss = pcb->ss;\
+	tbp = pcb->bp;\
+	asm mov sp, tsp;\
+	asm mov ss, tss;\
+	asm mov bp, tbp
+
+
+extern volatile timestamp sysruntime;
+enum{
+	TIMER_CHANGE_CONTEXT = 0x1
+};
 class Timer{
 	static pInterrupt oldRoutine;
 	static const int routineNo;
@@ -32,11 +56,6 @@ class Timer{
 	Timer();
 public:
 	static volatile int flags;
-	enum{
-		CHANGE_CONTEXT = 0x1,
-		SET_KERNEL=0x2,
-		SET_SAVED=0x4
-	};
 	static void create();
 	static void destroy();
 	static inline void changeContext();
