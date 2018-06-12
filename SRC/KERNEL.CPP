@@ -6,12 +6,13 @@
 #include "TEST.H"
 #include "T_SEMPC.H"
 #include "T_FLIST.H"
+#include "T_LLIST.H"
 #include "T_LAB.H"
 #include "T_SLIST.H"
 
 //extern int userMain(int argc,char*argv[]);
 int userMain(int argc, char*argv[]){
-	Test * test = new TLab();
+	Test * test = new TLList();
 	test->run();
 	delete test;
 	return 0;
