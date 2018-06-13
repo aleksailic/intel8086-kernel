@@ -9,6 +9,7 @@
 #include "PCB.H"
 #include "TIMER.H"
 #include <IOSTREAM.H>
+#include "SCHEDULE.H"
 
 KernelEv::KernelEv():val(0),mutex(0){
 	myPCB=PCB::running;

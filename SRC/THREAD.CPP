@@ -9,6 +9,7 @@
 #include "SCHEDULE.H"
 #include "TIMER.H"
 #include <IOSTREAM.H>
+#include "SYS.H"
 
 Thread::Thread(StackSize sz, Time quant){
 	myPCB = new PCB(sz,quant,this); //namesta flag automatski
@@ -30,11 +31,7 @@ Thread::~Thread(){
 
 
 void Thread::sleep(Time toSleep){
-	asm cli;
-	PCB::running->toSleep=toSleep;
-	SET_RFLAG(PCB_SLEEPING);
-	Timer::changeContext();
-	asm sti;
+	sys_sleep(toSleep);
 }
 
 void dispatch(){

@@ -39,9 +39,9 @@ class KernelThread{
 	KernelThread();
 
 	static KernelThread* self;
-	static PCB* blocked;
 	static void interrupt routine(...);
 public:
+	static PCB* blocked;
 	static unsigned task;
 	static const IVTNo ivtNo;
 	static KernelThread* getKernelThread();

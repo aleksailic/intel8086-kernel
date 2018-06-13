@@ -23,9 +23,9 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 		SET_FLAG(this,PCB_STACKLESS);
 	else{
 		scap=stackCapacity;
-		stack=new unsigned[1024];
+		stack=new unsigned[scap];
 
-		stack[stackCapacity-1]=0x200; //Interrupt is 1
+		stack[stackCapacity-1]=0x200;
 		stack[stackCapacity-2]=FP_SEG(fn);
 		stack[stackCapacity-3]=FP_OFF(fn);
 
@@ -36,7 +36,7 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 	//cout<<"Kreiran PCB "<< this->id << "\n";
 }
 PCB* PCB::running=new PCB(0,defaultTimeSlice,0,PCB_RUNNING,1); //Glavni tok programa ima svoj PCB i id:0
-unsigned PCB::nextId=2;
+unsigned PCB::nextId=3;
 
 void PCB::triggerRun(){
 	running->myThread->run();
@@ -51,12 +51,4 @@ static void loopAeterna(){
 	while(1);
 }
 
-PCB* PCB::createNOP(){
-	PCB*nop=new PCB(24,1,0,PCB_NOP);
-	nop->stack[nop->scap - 2]=FP_SEG(loopAeterna);
-	nop->stack[nop->scap - 3]=FP_OFF(loopAeterna);
-	return nop;
-}
-
-
-
+PCB* PCB::nop=new PCB(24,1,0,PCB_NOP,2,loopAeterna);

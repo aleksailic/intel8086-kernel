@@ -8,16 +8,18 @@
 #include <IOSTREAM.H>
 #include <DOS.H>
 #include "TIMER.H"
+#include "PCB.H"
+#include "SCHEDULE.H"
 #include "SLIST.H"
 
+static unsigned tss;
+static unsigned tsp;
+static unsigned tbp;
 
 static PCB* wakeMe=0;
-static PCB* nop=PCB::createNOP();
+SleepList* Timer::sleeplist = new SleepList();
 
-static SleepList sl;
 volatile timestamp sysruntime=0;
-
-unsigned tss=0,tsp=0,tcx=0,tdx=0,tbp=0;
 extern void tick();
 
 const int Timer::routineNo = 0x8;
@@ -34,9 +36,10 @@ void Timer::create(){
 }
 void Timer::destroy(){
 	restoreRoutine();
+	delete sleeplist;
 }
 void Timer::changeContext(){
-	SET_TFLAG(TIMER_CHANGE_CONTEXT);
+	SET_TFLAG(CHANGE_CONTEXT);
 	routine();
 }
 
@@ -63,13 +66,13 @@ void interrupt Timer::routine(...){
 		Timer::count--;
 		sysruntime++;
 		//tick();
-		sl.update();
-		while(wakeMe=sl.getReady()){
+		sleeplist->update();
+		while(wakeMe=sleeplist->getReady()){
 			CLR_FLAG(wakeMe,PCB_SLEEPING);
 			Scheduler::put(wakeMe);
 		}
 	}
-	if ( !Lock::isSet() && ((Timer::count == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(TIMER_CHANGE_CONTEXT))) {
+	if ( !Lock::isSet() && ((Timer::count == 0 && !CHK_RFLAG(PCB_UNLIMITED)) || CHK_TFLAG(CHANGE_CONTEXT))) {
 		STORE_REGS(PCB::running);
 
 		//PRINTOLD()
@@ -77,14 +80,14 @@ void interrupt Timer::routine(...){
 		CLR_RFLAG(PCB_RUNNING);
 
 		if(CHK_RFLAG(PCB_SLEEPING))
-			sl.add(PCB::running);
+			sleeplist->add(PCB::running);
 
 		if(!CHK_RFLAG(PCB_FINISHED) && !CHK_RFLAG(PCB_SLEEPING) && !CHK_RFLAG(PCB_BLOCKED) && !CHK_RFLAG(PCB_NOP) && !CHK_RFLAG(PCB_KERNEL))
 			Scheduler::put((PCB*)PCB::running);
 		PCB::running=Scheduler::get();
 
 		if(PCB::running==0)
-			PCB::running=nop;
+			PCB::running=PCB::nop;
 
 		//PRINTNEW()
 
@@ -94,9 +97,9 @@ void interrupt Timer::routine(...){
 		RESTORE_REGS(PCB::running);
 	}
 	//Poziv stare prekidne rutine
-	if(!CHK_TFLAG(TIMER_CHANGE_CONTEXT)) oldRoutine();
+	if(!CHK_TFLAG(CHANGE_CONTEXT)) oldRoutine();
 	//Vise ne menjamo konteks, ali sacuvaj ostale flegove mozda su relevantne
-	CLR_TFLAG(TIMER_CHANGE_CONTEXT);
+	CLR_TFLAG(CHANGE_CONTEXT);
 }
 
 unsigned char Lock::val=0;

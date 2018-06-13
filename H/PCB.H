@@ -56,10 +56,10 @@ public:
 
 	PCB(StackSize stackCapacity=0,Time quant=defaultTimeSlice,Thread* thread=0,unsigned flags=0,int id=-1,void(*fn)()=PCB::triggerRun);
 
+	static PCB* nop;
 	static PCB* running;
 	static void triggerRun();
 	static unsigned nextId;
-	static PCB* createNOP();
 };
 
 #endif /* PCB_H_ */

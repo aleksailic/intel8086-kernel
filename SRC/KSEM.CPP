@@ -9,6 +9,7 @@
 #include "PCB.H"
 #include "TIMER.H"
 #include <IOSTREAM.H>
+#include "SCHEDULE.H"
 
 KernelSem::KernelSem(int initValue){
 	val=initValue;
