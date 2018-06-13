@@ -8,31 +8,59 @@
 #ifndef H_VECTOR_H_
 #define H_VECTOR_H_
 
+#include "FLIST.H"
+
 template <class T>
 class Vector{
 	T* data;
-	unsigned cap;
-	unsigned size;
+	unsigned mcap;
+	unsigned msize;
+	unsigned mcount;
+	FList<int> free; //cuva ispraznjene indekse
 
 	void resize(){
-		T* n_data = new T[cap*2];
-		for(int i=0;i<cap;i++)
+		T* n_data = new T[mcap*2];
+		for(int i=0;i<mcap;i++)
 			n_data[i]=data[i];
 		delete[] data;
 		data=n_data;
-		cap*=2;
+		mcap*=2;
 	}
 public:
-	Vector(unsigned cap):cap(cap),size(0){
+	Vector(unsigned cap):mcap(cap),msize(0),mcount(0){
 		data = new T[cap];
 	}
-	void push_back(T& el){
-		if(size==cap)
+	void push_back(const T& el){
+		if(msize==mcap)
 			resize();
-		data[size++]=el;
+		data[msize++]=el;
+		mcount++;
+	}
+	int add(const T& el){ //pametna dodela
+		if(free.empty()){
+			push_back(el);
+			return msize-1;
+		}else{
+			int ind = *free.get();
+			data[ind]=el;
+			return ind;
+		}
+	}
+	void remove(int index){
+		free.add(new int(index));
 	}
 	T& operator[](int index){
 		return data[index];
+	}
+
+	unsigned count()const{
+		return mcount;
+	}
+	unsigned size()const{
+		return msize;
+	}
+	unsigned capacity()const{
+		return mcap;
 	}
 };
 
