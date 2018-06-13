@@ -12,7 +12,7 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 
-#define TH_COUNT 8
+#define TH_COUNT 20
 #define TH_NUM 8
 #define MAIN_NUM 3
 
@@ -43,9 +43,10 @@ void TLab::run(){
 
 		Thread::sleep(4);
 	}
-	for(int k=0;k<4;k++)
+	for(int k=0;k<TH_COUNT;k++){
 		thA[k].waitToComplete();
+		cout<<k<<": complete!\n";
+	}
 }
-
 
 #endif /* TEST_T_LAB_CPP_ */
