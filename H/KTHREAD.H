@@ -11,6 +11,7 @@
 #include "SYS.H"
 #include "IVTENTRY.H"
 #include "LLIST.H"
+#include "VECTOR.H"
 
 typedef void(*fn)(SysData*);
 
@@ -31,7 +32,13 @@ struct NestCall{
 };
 
 class PCB;
+class Semaphore;
+class Event;
 class KernelThread{
+	Vector<PCB*> pcbs;
+	Vector<Semaphore*> semaphores;
+	Vector<Event*> events;
+
 	PCB* myPCB;
 	fn syscallfn[10];
 	LList<NestCall> nestcalls;

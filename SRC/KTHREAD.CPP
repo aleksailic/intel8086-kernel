@@ -16,6 +16,7 @@
 #include "SLIST.H"
 
 #define GETPARAM(type,id) *((type*)data->params[id])
+#define VEC_CAP 32
 
 static void _sleep(SysData* data){
 	//PCB RUNNING JE KERNEL NIT!, blokirana nit mora da pajki
@@ -43,7 +44,7 @@ KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize
 const IVTNo KernelThread::ivtNo=0x60; //adresa prekidne rutine koja je slobodna
 unsigned KernelThread::task = SET_KERNEL;
 
-KernelThread::KernelThread(){
+KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP){
 	myPCB=new PCB(defaultStackSize,0,0,PCB_KERNEL,0,triggerRun); //id:0, nema thread jer ovo nije thread zapravo
 	syscallfn[SLEEP]=_sleep;
 	syscallfn[THREAD_CREATE]=_thread_create;
@@ -90,48 +91,12 @@ void interrupt KernelThread::routine(...){
 		cli
 		mov tcx, cx
 		mov tdx, dx
-		mov tsp, sp
-		mov tss, ss
-		mov tbp, bp
-	}
-	PCB::running->bp=tbp;
-	PCB::running->sp=tsp;
-	PCB::running->ss=tss;
-	CLR_RFLAG(PCB_RUNNING);
-
-	if(KernelThread::task==SET_KERNEL){ //odi na kernel stek
-		//cout<<"pcb"<<PCB::running->id <<" trazi kernel\n";
-		SET_RFLAG(PCB_BLOCKED);
-		blocked=PCB::running;
-		PCB::running=runningKernelThread->myPCB;
-	}else if(KernelThread::task==FINISH_KERNEL){
-		PCB::running=blocked;
-		blocked=0;
-		RESTORE_KERNEL_STACK(runningKernelThread->myPCB,segFn,offFn);
-		//cout<<"kernel vraca pcb"<<PCB::running->id<<"\n";
-	}
-
-	Timer::count=PCB::running->quant;
-	SET_STATUS_RFLAG(PCB_RUNNING);
-	tsp=PCB::running->sp;
-	tbp=PCB::running->bp;
-	tss=PCB::running->ss;
-	asm{
-		mov sp,tsp
-		mov ss,tss
-		mov bp, tbp
-	}
-
-
-	/*asm {
-		cli
-		mov tcx, cx
-		mov tdx, dx
 	}
 	STORE_REGS(PCB::running);
 	CLR_RFLAG(PCB_RUNNING);
-	if(CHK_KTASK(SET_KERNEL)){
-		if(!CHK_RFLAG(PCB_KERNEL)){ //da li nismo na kernel steku?
+
+	if(task==SET_KERNEL){ //odi na kernel stek
+		if(!CHK_RFLAG(PCB_KERNEL)){
 			SET_RFLAG(PCB_BLOCKED);
 			blocked=PCB::running;
 			PCB::running=runningKernelThread->myPCB;
@@ -140,20 +105,23 @@ void interrupt KernelThread::routine(...){
 			PUSH_FN();
 			STORE_REGS(PCB::running);
 		}
-	}
-	else if(CHK_KTASK(FINISH_KERNEL)){
-		if(runningKernelThread->nestcalls.empty()){ //vracamo se na blokiranu nit
-			//sta ako je nit uspavana lepotica? - taj problem resavamo interno kroz _sleep
+		//cout<<"pcb"<<PCB::running->id <<" trazi kernel\n";
+
+	}else if(task==FINISH_KERNEL){
+		if(runningKernelThread->nestcalls.empty()){
 			PCB::running=blocked;
-			CLR_RFLAG(PCB_BLOCKED);
+			blocked=0;
 			RESTORE_KERNEL_STACK(runningKernelThread->myPCB,segFn,offFn);
 		}else{
 			RESTORE_REGS(runningKernelThread->nestcalls.get());
 		}
+		//cout<<"kernel vraca pcb"<<PCB::running->id<<"\n";
 	}
+
 	SET_STATUS_RFLAG(PCB_RUNNING);
 	CLR_KTASK();
-	RESTORE_REGS(PCB::running);*/
+	Timer::count=PCB::running->quant;
+	RESTORE_REGS(PCB::running);
 }
 void KernelThread::triggerRun(){
 	runningKernelThread->run();

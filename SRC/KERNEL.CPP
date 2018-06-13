@@ -9,6 +9,7 @@
 #include "T_LLIST.H"
 #include "T_LAB.H"
 #include "T_SLIST.H"
+#include "T_VEC.H"
 
 //extern int userMain(int argc,char*argv[]);
 int userMain(int argc, char*argv[]){
