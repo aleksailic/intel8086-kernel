@@ -13,7 +13,7 @@
 
 //extern int userMain(int argc,char*argv[]);
 int userMain(int argc, char*argv[]){
-	Test * test = new TVec();
+	Test * test = new TLab();
 	test->run();
 	delete test;
 	return 0;

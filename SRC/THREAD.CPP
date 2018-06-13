@@ -12,21 +12,23 @@
 #include "SYS.H"
 
 Thread::Thread(StackSize sz, Time quant){
-	myPCB = new PCB(sz,quant,this); //namesta flag automatski
+	sys_thread_create(sz,quant,this,&id);
 }
 void Thread::start(){
-	cout<<"U scheduler stavljen PCB "<<myPCB->id <<'\n';
-	Scheduler::put(myPCB);
+	sys_thread_start(id);
 }
 
 void Thread::waitToComplete(){
-	myPCB->finished.wait(1);
+	//sys_thread_join(id);
+	sys_sleep(20);
+	//myPCB->finished.wait(1);
 }
 
 Thread::~Thread(){
 	//Ne moze waitToComplete() da se pozove jer se brise vtable, pa run() ne moze da se zavrsi :(
 	//waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
-	delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
+	//sys_thread_delete(id);
+	//delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
 }
 
 
@@ -35,9 +37,10 @@ void Thread::sleep(Time toSleep){
 }
 
 void dispatch(){
-	asm cli;
-	Timer::changeContext(); //da li se PSW stavlja na stek je pitanje? -Da, to radi kljucna rec interrupt
-	asm sti;
+	sys_dispatch();
+	//asm cli;
+	//Timer::changeContext(); //da li se PSW stavlja na stek je pitanje? -Da, to radi kljucna rec interrupt
+	//asm sti;
 }
 
 

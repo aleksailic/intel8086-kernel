@@ -26,7 +26,7 @@ protected:
 	friend class PCB;
 	virtual void run(){}
 private:
-	PCB* myPCB;
+	ID id;
 };
 
 void dispatch();

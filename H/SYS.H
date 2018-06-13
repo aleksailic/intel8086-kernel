@@ -12,6 +12,7 @@
 
 enum SYSCALL{
 	SLEEP,
+	DISPATCH,
 
 	THREAD_START,
 	THREAD_CREATE,
@@ -26,7 +27,7 @@ enum SYSCALL{
 
 struct SysData{
 	SYSCALL id;
-	void* params[8];
+	void* params[4];
 };
 
 typedef unsigned thread_t;
@@ -34,8 +35,9 @@ class Semaphore;
 class Event;
 
 void sys_sleep(Time time);
+void sys_dispatch();
 
-void sys_thread_create(StackSize sz, Time quant, ID* threadId);
+void sys_thread_create(StackSize sz, Time quant, Thread* thread,ID* threadId);
 void sys_thread_start(ID threadId);
 void sys_thread_join(ID threadId);
 

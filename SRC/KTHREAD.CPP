@@ -14,11 +14,12 @@
 #include <IOSTREAM.H>
 #include "SCHEDULE.H"
 #include "SLIST.H"
+#include "THREAD.H"
 
 #define GETPARAM(type,id) *((type*)data->params[id])
 #define VEC_CAP 32
 
-static void _sleep(SysData* data){
+void KernelThread::_sleep(SysData* data){
 	//PCB RUNNING JE KERNEL NIT!, blokirana nit mora da pajki
 	KernelThread::blocked->toSleep= GETPARAM(unsigned,0);
 	SET_FLAG(KernelThread::blocked,PCB_SLEEPING);
@@ -30,13 +31,34 @@ static void _sleep(SysData* data){
 	if(KernelThread::blocked==0)
 		KernelThread::blocked=PCB::nop;
 }
-static void _thread_create(SysData* data){}
-static void _thread_join(SysData* data){}
-static void _thread_start(SysData* data){}
-static void _sem_wait(SysData* data){}
-static void _sem_signal(SysData* data){}
-static void _event_wait(SysData* data){}
-static void _event_signal(SysData* data){}
+void KernelThread::_dispatch(SysData*data){
+	if(!CHK_KFLAG(PCB_FINISHED) && !CHK_KFLAG(PCB_SLEEPING) && !CHK_KFLAG(PCB_BLOCKED) && !CHK_KFLAG(PCB_NOP) && !CHK_KFLAG(PCB_KERNEL))
+		Scheduler::put((PCB*)KernelThread::blocked);
+	KernelThread::blocked=Scheduler::get();
+	if(KernelThread::blocked==0)
+		KernelThread::blocked=PCB::nop;
+}
+void KernelThread::_thread_create(SysData* data){
+	ID*id=GETPARAM(ID*,3);
+	*id=runningKernelThread->pcbs.add(
+		new PCB(
+			GETPARAM(StackSize,0),
+			GETPARAM(Time,1),
+			GETPARAM(Thread*,2)
+		)
+	);
+}
+void KernelThread::_thread_start(SysData* data){
+	cout<<"U scheduler stavljen PCB "<<GETPARAM(ID,0)<<'\n';
+	Scheduler::put(runningKernelThread->pcbs[GETPARAM(ID,0)]);
+}
+void KernelThread::_thread_join(SysData* data){
+	//sys_sem_wait();
+}
+void KernelThread::_sem_wait(SysData* data){}
+void KernelThread::_sem_signal(SysData* data){}
+void KernelThread::_event_wait(SysData* data){}
+void KernelThread::_event_signal(SysData* data){}
 
 KernelThread* KernelThread::self=0;
 KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize kernel thread
@@ -46,7 +68,13 @@ unsigned KernelThread::task = SET_KERNEL;
 
 KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP){
 	myPCB=new PCB(defaultStackSize,0,0,PCB_KERNEL,0,triggerRun); //id:0, nema thread jer ovo nije thread zapravo
+
+	pcbs[0]=myPCB;
+	pcbs[1]=PCB::running;
+	pcbs[2]=PCB::nop;
+
 	syscallfn[SLEEP]=_sleep;
+	syscallfn[DISPATCH]=_dispatch;
 	syscallfn[THREAD_CREATE]=_thread_create;
 	syscallfn[THREAD_JOIN]=_thread_join;
 	syscallfn[THREAD_START]=_thread_start;
