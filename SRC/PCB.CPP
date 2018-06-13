@@ -51,4 +51,4 @@ static void loopAeterna(){
 	while(1);
 }
 
-PCB* PCB::nop=new PCB(24,1,0,PCB_NOP,2,loopAeterna);
+PCB* PCB::nop=new PCB(1024,1,0,PCB_NOP,2,loopAeterna);

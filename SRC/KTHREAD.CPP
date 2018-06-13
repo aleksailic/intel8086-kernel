@@ -100,6 +100,7 @@ void interrupt KernelThread::routine(...){
 	CLR_RFLAG(PCB_RUNNING);
 
 	if(KernelThread::task==SET_KERNEL){ //odi na kernel stek
+		//cout<<"pcb"<<PCB::running->id <<" trazi kernel\n";
 		SET_RFLAG(PCB_BLOCKED);
 		blocked=PCB::running;
 		PCB::running=runningKernelThread->myPCB;
@@ -107,6 +108,7 @@ void interrupt KernelThread::routine(...){
 		PCB::running=blocked;
 		blocked=0;
 		RESTORE_KERNEL_STACK(runningKernelThread->myPCB,segFn,offFn);
+		//cout<<"kernel vraca pcb"<<PCB::running->id<<"\n";
 	}
 
 	Timer::count=PCB::running->quant;

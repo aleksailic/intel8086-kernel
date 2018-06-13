@@ -12,8 +12,8 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 
-#define TH_COUNT 20
-#define TH_NUM 8
+#define TH_COUNT 7
+#define TH_NUM 7
 #define MAIN_NUM 3
 
 TLab::A::A():Thread(1024,10){id=lastId++;}
@@ -45,7 +45,7 @@ void TLab::run(){
 	}
 	for(int k=0;k<TH_COUNT;k++){
 		thA[k].waitToComplete();
-		cout<<k<<": complete!\n";
+		//cout<<k<<": complete!\n";
 	}
 }
 
