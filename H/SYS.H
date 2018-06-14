@@ -48,6 +48,7 @@ void sys_dispatch();
 void sys_thread_create(StackSize sz, Time quant, Thread* thread,ID* threadId);
 void sys_thread_start(ID threadId);
 void sys_thread_join(ID threadId);
+void sys_thread_destroy(ID threadId);
 
 void sys_sem_create(sem_t* id,int value);
 void sys_sem_wait(sem_t id,int toBlock,int* retCode);

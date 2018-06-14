@@ -61,7 +61,6 @@ void KernelThread::_thread_destroy(SysData* data){
 	delete runningKernelThread->pcbs[id];
 	runningKernelThread->pcbs.remove(id);
 }
-
 void KernelThread::_sem_create(SysData* data){
 	sem_t * id = GETPARAM(sem_t*,0);
 	int val = GETPARAM(int,1);
@@ -108,11 +107,18 @@ KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP),n
 
 	syscallfn[SLEEP]=_sleep;
 	syscallfn[DISPATCH]=_dispatch;
+
 	syscallfn[THREAD_CREATE]=_thread_create;
 	syscallfn[THREAD_JOIN]=_thread_join;
 	syscallfn[THREAD_START]=_thread_start;
+	syscallfn[THREAD_DESTROY]=_thread_destroy;
+
+	syscallfn[SEM_CREATE]=_sem_create;
 	syscallfn[SEM_WAIT]=_sem_wait;
 	syscallfn[SEM_SIGNAL]=_sem_signal;
+	syscallfn[SEM_VAL]=_sem_val;
+	syscallfn[SEM_DESTROY]=_sem_destroy;
+
 	syscallfn[EVENT_SIGNAL]=_event_signal;
 	syscallfn[EVENT_WAIT]=_event_wait;
 

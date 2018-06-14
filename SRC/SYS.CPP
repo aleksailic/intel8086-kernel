@@ -86,6 +86,9 @@ void sys_thread_start(ID threadId){
 void sys_thread_join(ID threadId){
 	PACK1(THREAD_JOIN,threadId);
 }
+void sys_thread_destroy(ID threadId){
+	PACK1(THREAD_DESTROY,threadId);
+}
 
 void sys_sem_create(sem_t* id,int value){
 	PACK2(SEM_CREATE,id,value);

@@ -23,12 +23,8 @@ void Thread::waitToComplete(){
 }
 
 Thread::~Thread(){
-	//Ne moze waitToComplete() da se pozove jer se brise vtable, pa run() ne moze da se zavrsi :(
-	//waitToComplete(); //cekamo da se zavrsi ako nije, a pozvao se destruktor (po zadatku)
-	//sys_thread_delete(id);
-	//delete myPCB; //oslobadjamo prostor, u redu jer nece biti u scheduleru posto su tada blokirani prekidi
+	sys_thread_destroy(id);
 }
-
 
 void Thread::sleep(Time toSleep){
 	sys_sleep(toSleep);
