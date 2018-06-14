@@ -6,7 +6,6 @@
  */
 
 #include "SYS.H"
-#include "TIMER.H"
 #include "KTHREAD.H"
 #include <DOS.H>
 
@@ -117,4 +116,15 @@ void sys_event_signal(event_t id){
 }
 void sys_event_destroy(event_t id){
 	PACK1(EVENT_DESTROY,id);
+}
+
+unsigned char Lock::val=0;
+void Lock::set(){
+	val=1;
+}
+void Lock::unset(){
+	val=0;
+}
+unsigned char Lock::isSet(){
+	return val;
 }

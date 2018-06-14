@@ -5,7 +5,6 @@
  *      Author: OS1
  */
 #include "SEMAPHOR.H"
-#include "KSEM.H"
 #include "SYS.H"
 
 Semaphore::Semaphore(int initValue){

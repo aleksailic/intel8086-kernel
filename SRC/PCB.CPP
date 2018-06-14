@@ -35,9 +35,6 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 	//cout<<"Kreiran PCB "<< this->id << "\n";
 }
 
-PCB* PCB::running=new PCB(0,defaultTimeSlice,0,PCB_RUNNING,1); //Glavni tok programa ima svoj PCB i id:1
-unsigned PCB::nextId=3;
-
 void PCB::triggerRun(){
 	running->myThread->run();
 	//cout<<"JA("<<running->id-3<<") TO VOLIM!!!";
@@ -52,4 +49,6 @@ static void loopAeterna(){
 	while(1);
 }
 
+PCB* PCB::running=new PCB(0,defaultTimeSlice,0,PCB_RUNNING,1); //Glavni tok programa ima svoj PCB i id:1
 PCB* PCB::nop=new PCB(1024,1,0,PCB_NOP,2,loopAeterna);
+unsigned PCB::nextId=3;

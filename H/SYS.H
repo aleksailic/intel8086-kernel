@@ -45,7 +45,6 @@ class Event;
 
 void sys_sleep(Time time);
 void sys_dispatch();
-
 void sys_thread_create(StackSize sz, Time quant, Thread* thread,ID* threadId);
 void sys_thread_start(ID threadId);
 void sys_thread_join(ID threadId);
@@ -61,5 +60,14 @@ void sys_event_create(event_t*id,IVTNo ivtNo);
 void sys_event_wait(event_t id);
 void sys_event_signal(event_t id);
 void sys_event_destroy(event_t id);
+
+class Lock{
+	static unsigned char val;
+	Lock();
+public:
+	static void set();
+	static void unset();
+	static unsigned char isSet(); //ne postoji bool
+};
 
 #endif /* H_SYS_H_ */

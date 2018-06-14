@@ -8,7 +8,6 @@
 #include "IVTENTRY.H"
 #include "KEVENT.H"
 #include <DOS.H>
-#include <IOSTREAM.H>
 
 IVTEntry::IVTEntry(IVTNo numEntry,pInterrupt routine):newRoutine(routine),numEntry(numEntry),event(0){
 	oldRoutine = getvect(numEntry);

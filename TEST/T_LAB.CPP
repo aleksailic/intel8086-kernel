@@ -12,8 +12,8 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 
-#define TH_COUNT 8
-#define TH_NUM 7
+#define TH_COUNT 7
+#define TH_NUM 6
 #define MAIN_NUM 3
 
 TLab::A::A():Thread(1024,10){id=lastId++;}

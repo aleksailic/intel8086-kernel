@@ -4,11 +4,6 @@
  *  Created on: May 10, 2018
  *      Author: OS1
  */
-#include <DOS.H>
-#include "PCB.H"
-#include "SCHEDULE.H"
-#include "TIMER.H"
-#include <IOSTREAM.H>
 #include "SYS.H"
 
 Thread::Thread(StackSize sz, Time quant){

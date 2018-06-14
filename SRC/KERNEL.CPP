@@ -1,6 +1,4 @@
 #include <IOSTREAM.H>
-#include <DOS.H>
-
 #include "TIMER.H"
 
 #include "TEST.H"
@@ -11,13 +9,13 @@
 #include "T_SLIST.H"
 #include "T_VEC.H"
 
-extern int userMain(int argc,char*argv[]);
-/*int userMain(int argc, char*argv[]){
+//extern int userMain(int argc,char*argv[]);
+int userMain(int argc, char*argv[]){
 	Test * test = new TLab();
 	test->run();
 	delete test;
 	return 0;
-}*/
+}
 
 int main(int argc,char*argv[]){
 	Timer::create();

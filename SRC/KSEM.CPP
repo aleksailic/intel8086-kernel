@@ -7,7 +7,6 @@
 
 #include "KSEM.H"
 #include "PCB.H"
-#include "TIMER.H"
 #include <IOSTREAM.H>
 #include "SCHEDULE.H"
 #include "KTHREAD.H"

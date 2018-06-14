@@ -23,6 +23,21 @@ typedef void(*fn)(SysData*);
 #define CHK_KFLAG(f) CHK_FLAG(KernelThread::blocked,f)
 #define SET_KFLAG(f) SET_FLAG(KernelThread::blocked,f)
 
+#define STORE_REGS(pcb)\
+	asm mov tsp, sp;\
+	asm mov tss, ss;\
+	asm mov tbp, bp;\
+	(pcb)->sp = tsp;\
+	(pcb)->ss = tss;\
+	(pcb)->bp = tbp
+#define RESTORE_REGS(pcb)\
+	tsp = (pcb)->sp;\
+	tss = (pcb)->ss;\
+	tbp = (pcb)->bp;\
+	asm mov sp, tsp;\
+	asm mov ss, tss;\
+	asm mov bp, tbp
+
 enum{
 	SET_KERNEL=0x1,
 	FINISH_KERNEL=0x2

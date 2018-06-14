@@ -6,9 +6,6 @@
  */
 
 #include "EVENT.H"
-#include "KEVENT.H"
-#include "IVTENTRY.H"
-#include <IOSTREAM.H>
 #include "SYS.H"
 
 Event::Event(IVTNo ivtNo){

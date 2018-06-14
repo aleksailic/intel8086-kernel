@@ -34,6 +34,7 @@ void KernelThread::_sleep(SysData* data){
 		KernelThread::blocked=PCB::nop;
 }
 void KernelThread::_dispatch(SysData*data){
+	//Ona je uvek blocked pa je ovo suvisno
 	if(!CHK_KFLAG(PCB_FINISHED) && !CHK_KFLAG(PCB_SLEEPING) && !CHK_KFLAG(PCB_BLOCKED) && !CHK_KFLAG(PCB_NOP) && !CHK_KFLAG(PCB_KERNEL))
 		Scheduler::put((PCB*)KernelThread::blocked);
 	KernelThread::blocked=Scheduler::get();
@@ -88,7 +89,6 @@ void KernelThread::_sem_destroy(SysData* data){
 	delete runningKernelThread->semaphores[id];
 	runningKernelThread->semaphores.remove(id);
 }
-
 void KernelThread::_event_create(SysData* data){
 	event_t* id=GETPARAM(event_t*,0);
 	IVTNo ivtNo = GETPARAM(IVTNo,1);
@@ -156,11 +156,7 @@ KernelThread* KernelThread::getKernelThread(){
 	return self;
 }
 
-static unsigned tcx;
-static unsigned tdx;
-static unsigned tbp;
-static unsigned tss;
-static unsigned tsp;
+static unsigned tcx,tdx,tbp,tss,tsp;
 static unsigned segFn=FP_SEG(KernelThread::triggerRun);
 static unsigned offFn=FP_OFF(KernelThread::triggerRun);
 PCB* KernelThread::blocked = 0;
