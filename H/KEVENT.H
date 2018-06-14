@@ -13,6 +13,7 @@ class KernelEv{
 	PCB* myPCB;
 	int val;
 	int mutex;
+	int status;
 
 	inline void lock();
 	inline void unlock();

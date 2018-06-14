@@ -15,6 +15,8 @@
 #include "SCHEDULE.H"
 #include "SLIST.H"
 #include "THREAD.H"
+#include "IVTENTRY.H"
+#include "KEVENT.H"
 
 #define GETPARAM(type,id) *((type*)data->params[id])
 #define VEC_CAP 32
@@ -87,10 +89,32 @@ void KernelThread::_sem_destroy(SysData* data){
 	runningKernelThread->semaphores.remove(id);
 }
 
-void KernelThread::_event_create(SysData* data){}
-void KernelThread::_event_wait(SysData* data){}
-void KernelThread::_event_signal(SysData* data){}
-void KernelThread::_event_destroy(SysData* data){}
+void KernelThread::_event_create(SysData* data){
+	event_t* id=GETPARAM(event_t*,0);
+	IVTNo ivtNo = GETPARAM(IVTNo,1);
+
+	IVTEntry* entry= IVTEntry::fetch(ivtNo);
+	if(entry){
+		KernelEv* evt = new KernelEv();
+		IVTEntry::fetch(ivtNo)->setEvent(evt);
+		*id=runningKernelThread->events.add(evt);
+	}
+	else
+		cout<<"GRESKA!";
+}
+void KernelThread::_event_wait(SysData* data){
+	event_t id=GETPARAM(event_t,0);
+	runningKernelThread->events[id]->wait();
+}
+void KernelThread::_event_signal(SysData* data){
+	event_t id=GETPARAM(event_t,0);
+	runningKernelThread->events[id]->signal();
+}
+void KernelThread::_event_destroy(SysData* data){
+	event_t id=GETPARAM(event_t,0);
+	delete runningKernelThread->events[id];
+	runningKernelThread->events.remove(id);
+}
 
 KernelThread* KernelThread::self=0;
 KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize kernel thread
@@ -119,8 +143,10 @@ KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP),n
 	syscallfn[SEM_VAL]=_sem_val;
 	syscallfn[SEM_DESTROY]=_sem_destroy;
 
+	syscallfn[EVENT_CREATE]=_event_create;
 	syscallfn[EVENT_SIGNAL]=_event_signal;
 	syscallfn[EVENT_WAIT]=_event_wait;
+	syscallfn[EVENT_DESTROY]=_event_destroy;
 
 	setvect(ivtNo, routine); // ne mora da je vracamo posto je ovo slobodna zona
 }

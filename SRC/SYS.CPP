@@ -106,10 +106,15 @@ void sys_sem_destroy(sem_t id){
 	PACK1(SEM_DESTROY,id);
 }
 
-
-void sys_event_wait(Event* evt){
-	PACK1(EVENT_WAIT,evt);
+void sys_event_create(event_t*id,IVTNo ivtNo){
+	PACK2(EVENT_CREATE,id,ivtNo);
 }
-void sys_event_signal(Event* evt){
-	PACK1(EVENT_SIGNAL,evt);
+void sys_event_wait(event_t id){
+	PACK1(EVENT_WAIT,id);
+}
+void sys_event_signal(event_t id){
+	PACK1(EVENT_SIGNAL,id);
+}
+void sys_event_destroy(event_t id){
+	PACK1(EVENT_DESTROY,id);
 }

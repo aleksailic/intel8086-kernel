@@ -9,22 +9,17 @@
 #include "KEVENT.H"
 #include "IVTENTRY.H"
 #include <IOSTREAM.H>
+#include "SYS.H"
 
 Event::Event(IVTNo ivtNo){
-	myImpl=new KernelEv();
-	IVTEntry* entry = IVTEntry::fetch(ivtNo);
-	if(entry)
-		IVTEntry::fetch(ivtNo)->setEvent(this->myImpl);
-	else
-		cout<<"GRESKA!";
-
+	sys_event_create(&id,ivtNo);
 }
 Event::~Event(){
-	delete myImpl;
+	sys_event_destroy(id);
 }
 void Event::signal(){
-	myImpl->signal();
+	sys_event_signal(id);
 }
 void Event::wait(){
-	myImpl->wait();
+	sys_event_wait(id);
 }

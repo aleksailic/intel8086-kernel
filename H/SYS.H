@@ -39,6 +39,7 @@ struct SysData{
 typedef int thread_t;
 typedef unsigned sem_t;
 typedef unsigned event_t;
+typedef unsigned char IVTNo;
 class Semaphore;
 class Event;
 
@@ -56,7 +57,9 @@ void sys_sem_signal(sem_t id);
 void sys_sem_val(sem_t id, int* val);
 void sys_sem_destroy(sem_t id);
 
+void sys_event_create(event_t*id,IVTNo ivtNo);
 void sys_event_wait(event_t id);
 void sys_event_signal(event_t id);
+void sys_event_destroy(event_t id);
 
 #endif /* H_SYS_H_ */

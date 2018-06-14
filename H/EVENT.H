@@ -9,6 +9,7 @@
 #define H_EVENT_H_
 
 typedef unsigned char IVTNo;
+typedef unsigned event_t;
 class KernelEv;
 
 class Event{
@@ -19,9 +20,9 @@ public:
 	void wait();
 protected:
 	friend class KernelEv;
-	void signal(); //can call KernelEv
+	void signal();
 private:
-	KernelEv* myImpl;
+	event_t id;
 };
 
 #endif /* H_EVENT_H_ */

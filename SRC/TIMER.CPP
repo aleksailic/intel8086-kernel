@@ -65,7 +65,7 @@ void interrupt Timer::routine(...){
 	if(!Timer::flags){ //nema eksplicitnog poziva
 		Timer::count--;
 		sysruntime++;
-		//tick();
+		tick();
 		sleeplist->update();
 		while(wakeMe=sleeplist->getReady()){
 			CLR_FLAG(wakeMe,PCB_SLEEPING);
