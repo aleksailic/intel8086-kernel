@@ -34,6 +34,7 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 	}
 	//cout<<"Kreiran PCB "<< this->id << "\n";
 }
+
 PCB* PCB::running=new PCB(0,defaultTimeSlice,0,PCB_RUNNING,1); //Glavni tok programa ima svoj PCB i id:1
 unsigned PCB::nextId=3;
 

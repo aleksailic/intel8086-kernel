@@ -19,13 +19,13 @@ typedef void interrupt (*pInterrupt)(...);
 	asm mov tsp, sp;\
 	asm mov tss, ss;\
 	asm mov tbp, bp;\
-	pcb->sp = tsp;\
-	pcb->ss = tss;\
-	pcb->bp = tbp
+	(pcb)->sp = tsp;\
+	(pcb)->ss = tss;\
+	(pcb)->bp = tbp
 #define RESTORE_REGS(pcb)\
-	tsp = pcb->sp;\
-	tss = pcb->ss;\
-	tbp = pcb->bp;\
+	tsp = (pcb)->sp;\
+	tss = (pcb)->ss;\
+	tbp = (pcb)->bp;\
 	asm mov sp, tsp;\
 	asm mov ss, tss;\
 	asm mov bp, tbp

@@ -19,9 +19,7 @@ void Thread::start(){
 }
 
 void Thread::waitToComplete(){
-	//sys_thread_join(id);
-	sys_sleep(20);
-	//myPCB->finished.wait(1);
+	sys_thread_join(id);
 }
 
 Thread::~Thread(){
@@ -38,9 +36,6 @@ void Thread::sleep(Time toSleep){
 
 void dispatch(){
 	sys_dispatch();
-	//asm cli;
-	//Timer::changeContext(); //da li se PSW stavlja na stek je pitanje? -Da, to radi kljucna rec interrupt
-	//asm sti;
 }
 
 

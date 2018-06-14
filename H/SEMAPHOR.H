@@ -8,7 +8,7 @@
 #ifndef H_SEMAPHOR_H_
 #define H_SEMAPHOR_H_
 
-
+typedef unsigned sem_t;
 class KernelSem;
 
 class Semaphore{
@@ -21,7 +21,7 @@ public:
 
 	int val() const;
 private:
-	KernelSem* myImpl;
+	sem_t id;
 };
 
 

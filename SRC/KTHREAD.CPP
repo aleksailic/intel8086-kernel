@@ -53,12 +53,45 @@ void KernelThread::_thread_start(SysData* data){
 	Scheduler::put(runningKernelThread->pcbs[GETPARAM(ID,0)]);
 }
 void KernelThread::_thread_join(SysData* data){
-	//sys_sem_wait();
+	thread_t id = GETPARAM(thread_t,0);
+	runningKernelThread->pcbs[id]->finished.wait(1); //indirektno poziva sys_dispatch()
 }
-void KernelThread::_sem_wait(SysData* data){}
-void KernelThread::_sem_signal(SysData* data){}
+void KernelThread::_thread_destroy(SysData* data){
+	thread_t id = GETPARAM(thread_t,0);
+	delete runningKernelThread->pcbs[id];
+	runningKernelThread->pcbs.remove(id);
+}
+
+void KernelThread::_sem_create(SysData* data){
+	sem_t * id = GETPARAM(sem_t*,0);
+	int val = GETPARAM(int,1);
+	*id=runningKernelThread->semaphores.add(new KernelSem(val));
+}
+void KernelThread::_sem_wait(SysData* data){
+	sem_t id = GETPARAM(sem_t,0);
+	int toBlock = GETPARAM(int,1);
+	int* retVal = GETPARAM(int*,2);
+	*retVal = runningKernelThread->semaphores[id]->wait(toBlock);
+}
+void KernelThread::_sem_signal(SysData* data){
+	sem_t id = GETPARAM(sem_t,0);
+	runningKernelThread->semaphores[id]->signal();
+}
+void KernelThread::_sem_val(SysData* data){
+	sem_t id = GETPARAM(sem_t,0);
+	int* retVal = GETPARAM(int*,1);
+	*retVal = runningKernelThread->semaphores[id]->getVal();
+}
+void KernelThread::_sem_destroy(SysData* data){
+	sem_t id = GETPARAM(sem_t,0);
+	delete runningKernelThread->semaphores[id];
+	runningKernelThread->semaphores.remove(id);
+}
+
+void KernelThread::_event_create(SysData* data){}
 void KernelThread::_event_wait(SysData* data){}
 void KernelThread::_event_signal(SysData* data){}
+void KernelThread::_event_destroy(SysData* data){}
 
 KernelThread* KernelThread::self=0;
 KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize kernel thread
@@ -66,12 +99,12 @@ KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize
 const IVTNo KernelThread::ivtNo=0x60; //adresa prekidne rutine koja je slobodna
 unsigned KernelThread::task = SET_KERNEL;
 
-KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP){
+KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP),nestcalls(5){
 	myPCB=new PCB(defaultStackSize,0,0,PCB_KERNEL,0,triggerRun); //id:0, nema thread jer ovo nije thread zapravo
 
-	pcbs[0]=myPCB;
-	pcbs[1]=PCB::running;
-	pcbs[2]=PCB::nop;
+	pcbs.add(myPCB);
+	pcbs.add(PCB::running);
+	pcbs.add(PCB::nop);
 
 	syscallfn[SLEEP]=_sleep;
 	syscallfn[DISPATCH]=_dispatch;
@@ -104,7 +137,7 @@ PCB* KernelThread::blocked = 0;
 	asm pushf;\
 	asm push segFn;\
 	asm push offFn;\
-	asm sub sp, 9
+	asm sub sp, 18
 
 #define RESTORE_KERNEL_STACK(pcb,seg,off)\
     pcb->stack[pcb->scap-1]=0x200;\
@@ -113,6 +146,9 @@ PCB* KernelThread::blocked = 0;
     pcb->sp=FP_OFF(pcb->stack+pcb->scap-12);\
     pcb->ss=FP_SEG(pcb->stack+pcb->scap-12);\
     pcb->bp=FP_OFF(pcb->stack+pcb->scap-12)
+
+
+static NestCall nestcall;
 
 void interrupt KernelThread::routine(...){
 	asm{
@@ -129,7 +165,10 @@ void interrupt KernelThread::routine(...){
 			blocked=PCB::running;
 			PCB::running=runningKernelThread->myPCB;
 		}else{
-			runningKernelThread->nestcalls.add(new NestCall(tsp,tss,tbp));
+			nestcall.bp=tbp;
+			nestcall.ss=tss;
+			nestcall.sp=tsp;
+			runningKernelThread->nestcalls.push(nestcall);
 			PUSH_FN();
 			STORE_REGS(PCB::running);
 		}
@@ -141,7 +180,10 @@ void interrupt KernelThread::routine(...){
 			blocked=0;
 			RESTORE_KERNEL_STACK(runningKernelThread->myPCB,segFn,offFn);
 		}else{
-			RESTORE_REGS(runningKernelThread->nestcalls.get());
+			nestcall=runningKernelThread->nestcalls.pop();
+			PCB::running->sp=nestcall.sp;
+			PCB::running->ss=nestcall.ss;
+			PCB::running->bp=nestcall.bp;
 		}
 		//cout<<"kernel vraca pcb"<<PCB::running->id<<"\n";
 	}

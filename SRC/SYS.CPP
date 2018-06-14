@@ -70,6 +70,7 @@ static unsigned tdx;
 	SEND(data);\
 	asm sti
 
+
 void sys_sleep(Time time){
 	PACK1(SLEEP,time);
 }
@@ -85,12 +86,24 @@ void sys_thread_start(ID threadId){
 void sys_thread_join(ID threadId){
 	PACK1(THREAD_JOIN,threadId);
 }
-void sys_sem_wait(Semaphore* sem){
-	PACK1(SEM_WAIT,sem);
+
+void sys_sem_create(sem_t* id,int value){
+	PACK2(SEM_CREATE,id,value);
 }
-void sys_sem_signal(Semaphore* sem){
-	PACK1(SEM_SIGNAL,sem);
+void sys_sem_wait(sem_t id,int toBlock,int* retCode){
+	PACK3(SEM_WAIT,id,toBlock,retCode);
 }
+void sys_sem_signal(sem_t id){
+	PACK1(SEM_SIGNAL,id);
+}
+void sys_sem_val(sem_t id, int* val){
+	PACK2(SEM_VAL,id,val);
+}
+void sys_sem_destroy(sem_t id){
+	PACK1(SEM_DESTROY,id);
+}
+
+
 void sys_event_wait(Event* evt){
 	PACK1(EVENT_WAIT,evt);
 }

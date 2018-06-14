@@ -10,8 +10,8 @@
 
 #include "SYS.H"
 #include "IVTENTRY.H"
-#include "LLIST.H"
 #include "VECTOR.H"
+#include "STACK.H"
 
 typedef void(*fn)(SysData*);
 
@@ -32,7 +32,6 @@ struct NestCall{
 	unsigned sp;
 	unsigned ss;
 	unsigned bp;
-	NestCall(unsigned sp,unsigned ss,unsigned bp):sp(sp),ss(ss),bp(bp){}
 };
 
 class PCB;
@@ -44,8 +43,8 @@ class KernelThread{
 	Vector<KernelEv*> events;
 
 	PCB* myPCB;
-	fn syscallfn[10];
-	LList<NestCall> nestcalls;
+	fn syscallfn[15];
+	Stack<NestCall> nestcalls;
 	void run();
 	KernelThread();
 
@@ -54,13 +53,22 @@ class KernelThread{
 
 	static void _sleep(SysData* data);
 	static void _dispatch(SysData* data);
+
 	static void _thread_create(SysData* data);
 	static void _thread_join(SysData* data);
 	static void _thread_start(SysData* data);
+	static void _thread_destroy(SysData* data);
+
+	static void _sem_create(SysData* data);
 	static void _sem_wait(SysData* data);
 	static void _sem_signal(SysData* data);
+	static void _sem_val(SysData* data);
+	static void _sem_destroy(SysData* data);
+
+	static void _event_create(SysData* data);
 	static void _event_wait(SysData* data);
 	static void _event_signal(SysData* data);
+	static void _event_destroy(SysData* data);
 public:
 	static PCB* blocked;
 	static unsigned task;

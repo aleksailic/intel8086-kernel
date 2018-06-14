@@ -14,15 +14,21 @@ enum SYSCALL{
 	SLEEP,
 	DISPATCH,
 
-	THREAD_START,
 	THREAD_CREATE,
+	THREAD_START,
 	THREAD_JOIN,
+	THREAD_DESTROY,
 
+	SEM_CREATE,
 	SEM_WAIT,
 	SEM_SIGNAL,
+	SEM_VAL,
+	SEM_DESTROY,
 
+	EVENT_CREATE,
 	EVENT_SIGNAL,
-	EVENT_WAIT
+	EVENT_WAIT,
+	EVENT_DESTROY
 };
 
 struct SysData{
@@ -30,7 +36,9 @@ struct SysData{
 	void* params[4];
 };
 
-typedef unsigned thread_t;
+typedef int thread_t;
+typedef unsigned sem_t;
+typedef unsigned event_t;
 class Semaphore;
 class Event;
 
@@ -41,10 +49,13 @@ void sys_thread_create(StackSize sz, Time quant, Thread* thread,ID* threadId);
 void sys_thread_start(ID threadId);
 void sys_thread_join(ID threadId);
 
-void sys_sem_wait(Semaphore* sem);
-void sys_sem_signal(Semaphore* sem);
+void sys_sem_create(sem_t* id,int value);
+void sys_sem_wait(sem_t id,int toBlock,int* retCode);
+void sys_sem_signal(sem_t id);
+void sys_sem_val(sem_t id, int* val);
+void sys_sem_destroy(sem_t id);
 
-void sys_event_wait(Event* evt);
-void sys_event_signal(Event* evt);
+void sys_event_wait(event_t id);
+void sys_event_signal(event_t id);
 
 #endif /* H_SYS_H_ */

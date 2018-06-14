@@ -10,6 +10,7 @@
 #include "TIMER.H"
 #include <IOSTREAM.H>
 #include "SCHEDULE.H"
+#include "KTHREAD.H"
 
 KernelSem::KernelSem(int initValue){
 	val=initValue;
@@ -41,15 +42,13 @@ int KernelSem::wait(int toBlock){
 }
 void KernelSem::block(){
 	//cout<<"sem blocking: "<<PCB::running->id<<endl;
-	blocked.add(PCB::running);
-	SET_RFLAG(PCB_BLOCKED);
+	blocked.add(KernelThread::blocked);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
-	Timer::changeContext();
+	sys_dispatch();
 }
 void KernelSem::unblock(){
 	PCB* pcb = blocked.get();
 	//cout<<"sem unblocking: "<<pcb->id<<endl;
-	CLR_FLAG(pcb,PCB_BLOCKED);
 	if(pcb) //nepotrbno ali dok smo u "debugging" modu ok
 		Scheduler::put(pcb);
 }

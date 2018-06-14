@@ -6,21 +6,26 @@
  */
 #include "SEMAPHOR.H"
 #include "KSEM.H"
+#include "SYS.H"
 
 Semaphore::Semaphore(int initValue){
-	myImpl=new KernelSem(initValue);
+	sys_sem_create(&id,initValue);
 }
 int Semaphore::wait(int toBlock){
-	return myImpl->wait(toBlock);
+	int retVal;
+	sys_sem_wait(id,toBlock,&retVal);
+	return retVal;
 }
 void Semaphore::signal(){
-	myImpl->signal();
+	sys_sem_signal(id);
 }
 int Semaphore::val()const {
-	return myImpl->getVal();
+	int val;
+	sys_sem_val(id,&val);
+	return val;
 }
 Semaphore::~Semaphore(){
-	delete myImpl;
+	sys_sem_destroy(id);
 }
 
 
