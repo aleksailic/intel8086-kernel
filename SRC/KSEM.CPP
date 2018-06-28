@@ -41,6 +41,7 @@ int KernelSem::wait(int toBlock){
 }
 void KernelSem::block(){
 	//cout<<"sem blocking: "<<PCB::running->id<<endl;
+	SET_KFLAG(PCB_BLOCKED);
 	blocked.add(KernelThread::blocked);
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
 	sys_dispatch();

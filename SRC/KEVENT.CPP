@@ -31,6 +31,7 @@ void KernelEv::signal(){
 }
 void KernelEv::block(){
 	//cout<<"ev blocking: "<<PCB::running->id<<endl;
+	SET_KFLAG(PCB_BLOCKED);
 	status=1;
 	mutex=0; //promenom konteksta nikada ne dolazi do unlocka, zato mutex mora da se reseta rucno
 	sys_dispatch();

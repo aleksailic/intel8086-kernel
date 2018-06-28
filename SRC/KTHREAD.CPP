@@ -34,7 +34,6 @@ void KernelThread::_sleep(SysData* data){
 		KernelThread::blocked=PCB::nop;
 }
 void KernelThread::_dispatch(SysData*data){
-	//Ona je uvek blocked pa je ovo suvisno
 	if(!CHK_KFLAG(PCB_FINISHED) && !CHK_KFLAG(PCB_SLEEPING) && !CHK_KFLAG(PCB_BLOCKED) && !CHK_KFLAG(PCB_NOP) && !CHK_KFLAG(PCB_KERNEL))
 		Scheduler::put((PCB*)KernelThread::blocked);
 	KernelThread::blocked=Scheduler::get();
@@ -189,7 +188,6 @@ void interrupt KernelThread::routine(...){
 
 	if(task==SET_KERNEL){ //odi na kernel stek
 		if(!CHK_RFLAG(PCB_KERNEL)){
-			SET_RFLAG(PCB_BLOCKED);
 			blocked=PCB::running;
 			PCB::running=runningKernelThread->myPCB;
 		}else{
