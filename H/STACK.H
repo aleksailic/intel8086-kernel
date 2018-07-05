@@ -19,6 +19,9 @@ public:
 	void push(const T& el){
 		data[count++]=el;
 	}
+	T& peek(){
+		return data[count-1];
+	}
 	T& pop(){
 		return data[--count];
 	}

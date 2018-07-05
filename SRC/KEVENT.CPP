@@ -12,11 +12,11 @@
 #include "KTHREAD.H"
 
 KernelEv::KernelEv():val(0),mutex(0),status(0){
-	myPCB=KernelThread::blocked;
+	myPCB=KernelThread::captured;
 }
 void KernelEv::wait(){
 	lock();
-	if(KernelThread::blocked==myPCB){
+	if(KernelThread::captured==myPCB){
 		if(val==0) block();
 		else val=0;
 	}

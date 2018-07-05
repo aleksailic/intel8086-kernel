@@ -19,9 +19,9 @@ typedef void(*fn)(SysData*);
 #define SET_KTASK(t) KernelThread::task=t
 #define CLR_KTASK() KernelThread::task=0
 
-#define CLR_KFLAG(f) CLR_FLAG(KernelThread::blocked,f)
-#define CHK_KFLAG(f) CHK_FLAG(KernelThread::blocked,f)
-#define SET_KFLAG(f) SET_FLAG(KernelThread::blocked,f)
+#define CLR_KFLAG(f) CLR_FLAG(KernelThread::captured,f)
+#define CHK_KFLAG(f) CHK_FLAG(KernelThread::captured,f)
+#define SET_KFLAG(f) SET_FLAG(KernelThread::captured,f)
 
 #define STORE_REGS(pcb)\
 	asm mov tsp, sp;\
@@ -56,36 +56,22 @@ class KernelThread{
 	Vector<PCB*> pcbs;
 	Vector<KernelSem*> semaphores;
 	Vector<KernelEv*> events;
-
-	PCB* myPCB;
-	fn syscallfn[15];
 	Stack<NestCall> nestcalls;
-	void run();
-	KernelThread();
+	PCB* myPCB;
+
+	static fn syscallfn[15];
+	static void _sleep(SysData* data), _dispatch(SysData*data),
+				_thread_create(SysData* data), _thread_start(SysData* data), _thread_join(SysData* data), _thread_destroy(SysData* data),
+				_sem_create(SysData* data), _sem_wait(SysData* data), _sem_signal(SysData* data), _sem_val(SysData* data), _sem_destroy(SysData* data),
+				_event_create(SysData* data),_event_wait(SysData* data), _event_signal(SysData* data), _event_destroy(SysData* data);
 
 	static KernelThread* self;
+	KernelThread();
+
+	void run();
 	static void interrupt routine(...);
-
-	static void _sleep(SysData* data);
-	static void _dispatch(SysData* data);
-
-	static void _thread_create(SysData* data);
-	static void _thread_join(SysData* data);
-	static void _thread_start(SysData* data);
-	static void _thread_destroy(SysData* data);
-
-	static void _sem_create(SysData* data);
-	static void _sem_wait(SysData* data);
-	static void _sem_signal(SysData* data);
-	static void _sem_val(SysData* data);
-	static void _sem_destroy(SysData* data);
-
-	static void _event_create(SysData* data);
-	static void _event_wait(SysData* data);
-	static void _event_signal(SysData* data);
-	static void _event_destroy(SysData* data);
 public:
-	static PCB* blocked;
+	static PCB* captured;
 	static unsigned task;
 	static const IVTNo ivtNo;
 	static KernelThread* getKernelThread();

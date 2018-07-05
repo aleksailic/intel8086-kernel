@@ -40,6 +40,7 @@ void interrupt Timer::routine(...){
 	Timer::count--;
 	sysruntime++;
 	//tick();
+	cout<<"PCB: "<<PCB::running->id<<", TIMER COUNT: !"<<Timer::count<<endl;
 	sleeplist->update();
 	while(wakeMe=sleeplist->getReady()){
 		CLR_FLAG(wakeMe,PCB_SLEEPING);

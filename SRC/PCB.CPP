@@ -36,13 +36,11 @@ PCB::PCB(StackSize stackCapacity,Time quant,Thread* thread,unsigned flags,int id
 }
 
 void PCB::triggerRun(){
+	asm sti;
 	running->myThread->run();
-	//cout<<"JA("<<running->id-3<<") TO VOLIM!!!";
-	asm cli; // mere predostroznosti
 	running->finished.signal();
 	SET_RFLAG(PCB_FINISHED);
 	dispatch();
-	asm sti;
 }
 
 static void loopAeterna(){

@@ -43,11 +43,13 @@ public:
 		}else{
 			int ind = *free.get();
 			data[ind]=el;
+			mcount++;
 			return ind;
 		}
 	}
 	void remove(int index){
 		free.add(new int(index));
+		mcount--;
 	}
 	T& operator[](int index){
 		return data[index];
