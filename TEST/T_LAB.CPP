@@ -13,7 +13,7 @@
 #include <IOSTREAM.H>
 #include "TIMER.H"
 
-#define TH_COUNT 3
+#define TH_COUNT 4
 #define TH_NUM 5
 #define MAIN_NUM 3
 
@@ -46,8 +46,9 @@ void TLab::run(){
 		cout<<"main "<<i<<endl;
 		asm sti;
 
+		int rnd=rand();
 		for(int j=0;j<30000;j++)
-			for(int k=0;k<30000;k++);
+			for(int k=0;k<rnd;k++);
 	}
 	for(int k=0;k<TH_COUNT;k++){
 		thA[k].waitToComplete();

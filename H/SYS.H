@@ -31,11 +31,25 @@ enum SYSCALL{
 	EVENT_DESTROY
 };
 
+#define STORE_REGS(pcb)\
+	asm mov tsp, sp;\
+	asm mov tss, ss;\
+	asm mov tbp, bp;\
+	(pcb)->sp = tsp;\
+	(pcb)->ss = tss;\
+	(pcb)->bp = tbp
+#define RESTORE_REGS(pcb)\
+	tsp = (pcb)->sp;\
+	tss = (pcb)->ss;\
+	tbp = (pcb)->bp;\
+	asm mov sp, tsp;\
+	asm mov ss, tss;\
+	asm mov bp, tbp
+
 struct SysData{
 	SYSCALL id;
 	void* params[4];
 };
-
 typedef int thread_t;
 typedef unsigned sem_t;
 typedef unsigned event_t;
