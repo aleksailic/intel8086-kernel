@@ -15,7 +15,8 @@ protected:
     T el; //pravi kopiju!
     T_w*next;
 
-    T_w(const T& el,T_w*next=0):el(el),next(next){}
+    T_w(const T& elem):el(elem),next(0){}
+    T_w(const T& elem,T_w*nxt):el(elem),next(nxt){}
   };
   T_w*first;
   T_w*last;
@@ -53,18 +54,18 @@ public:
   };
   List():first(0),last(0),mcount(0){}
   virtual ~List(){
-	  /*T_w*itr=first;
+	  T_w*itr=first;
 	  while(itr!=0){
 		  T_w* toDelete = itr;
 		  itr=itr->next;
 		  delete toDelete;
-	  }*/
+	  }
   }
 
   iter begin(){ return iter(&first); }
   iter end() { return (last==0 ? iter(&(last)) : iter(&(last->next))); }
 
-  virtual List& add(const T& el){
+  List& add(const T& el){
     last = (first ? last->next : first) = new T_w(el);
     mcount++;
     return *this;
@@ -72,12 +73,13 @@ public:
   int empty()const{
     return (first==0 ? 1 : 0);
   }
-  virtual T get(){
+  T get(){
 	  if(empty())
 		  return 0;
 	  T toReturn = first->el;
 	  T_w*toDelete = first;
 	  first=first->next;
+	  if(first==0)last=0;
 	  delete toDelete;
 	  mcount--;
 	  return toReturn;

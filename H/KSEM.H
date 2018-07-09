@@ -8,13 +8,13 @@
 #ifndef H_KSEM_H_
 #define H_KSEM_H_
 
-#include "FLIST.H"
+#include "LIST.H"
 
 class PCB;
 class KernelSem{
 	int val;
 	int mutex;
-	FList<PCB> blocked;
+	List<PCB*> blocked;
 	inline void block();
 	inline void unblock();
 	inline void lock();

@@ -31,7 +31,6 @@ void TList::run(){
 	for(int j=0;j<N;j++){
 		cout << lst.get() << " ";
 	}
-	cout<<"LST SIZE: "<<lst.get()<<endl;
 }
 
 #endif /* TEST_T_LIST_CPP_ */

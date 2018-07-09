@@ -12,6 +12,7 @@
 #include <STDLIB.H>
 #include <IOSTREAM.H>
 #include "TIMER.H"
+#include "SYS.H"
 
 #define TH_COUNT 4
 #define TH_NUM 5
@@ -45,13 +46,11 @@ void TLab::run(){
 		asm cli;
 		cout<<"main "<<i<<endl;
 		asm sti;
-
 		for(int j=0;j<30000;j++)
 			for(int k=0;k<30000;k++);
 	}
 	for(int k=0;k<TH_COUNT;k++){
 		thA[k].waitToComplete();
-		//cout<<k<<": complete!\n";
 	}
 }
 
