@@ -26,19 +26,13 @@ void TLList::run(){
 		if(rand()%2){
 			index=rand() % N;
 			cout<<"stavljam: " << arr[index] <<'\n';
-			ll.add(&arr[index]);
+			ll.add(arr[index]);
 		}else{
 			if(!ll.empty())
-				cout<<"uzimam: "<< *(ll.get())<<'\n';
+				cout<<"uzimam: "<< ll.get()<<'\n';
 			else
 				cout<<"prazna!\n";
 		}
-		/*for(int j=0;;j++){
-			int* el = ll.view(j);
-			if(el==0)
-				break;
-			cout<< *el <<"|";
-		}*/
 	}
 }
 

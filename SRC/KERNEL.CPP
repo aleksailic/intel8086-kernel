@@ -8,10 +8,11 @@
 #include "T_LAB.H"
 #include "T_SLIST.H"
 #include "T_VEC.H"
+#include "T_LIST.H"
 
 //extern int userMain(int argc,char*argv[]);
 int userMain(int argc, char*argv[]){
-	Test * test = new TLab();
+	Test * test = new TFList();
 	test->run();
 	delete test;
 	return 0;

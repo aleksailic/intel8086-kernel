@@ -23,22 +23,21 @@
 
 void KernelThread::_sleep(SysData* data){
 	//PCB RUNNING JE KERNEL NIT!, blokirana nit mora da pajki
-	KernelThread::blocked->toSleep= GETPARAM(unsigned,0);
-	SET_FLAG(KernelThread::blocked,PCB_SLEEPING);
+	KernelThread::captured->toSleep= GETPARAM(unsigned,0);
+	SET_FLAG(KernelThread::captured,PCB_SLEEPING);
 
-	Timer::sleeplist->add(KernelThread::blocked);
+	Timer::sleeplist->add(KernelThread::captured);
 
 	//moramo promeniti kontekst na sledecu dozvoljenu, inace nece doci do spavanja uopste
-	KernelThread::blocked=Scheduler::get();
-	if(KernelThread::blocked==0)
-		KernelThread::blocked=PCB::nop;
+	//nema smisla koristiti sistemski poziv, kad smo vec na kernel steku
+	_dispatch(data);
 }
 void KernelThread::_dispatch(SysData*data){
 	if(!CHK_KFLAG(PCB_FINISHED) && !CHK_KFLAG(PCB_SLEEPING) && !CHK_KFLAG(PCB_BLOCKED) && !CHK_KFLAG(PCB_NOP) && !CHK_KFLAG(PCB_KERNEL))
-		Scheduler::put((PCB*)KernelThread::blocked);
-	KernelThread::blocked=Scheduler::get();
-	if(KernelThread::blocked==0)
-		KernelThread::blocked=PCB::nop;
+		Scheduler::put((PCB*)KernelThread::captured);
+	KernelThread::captured=Scheduler::get();
+	if(KernelThread::captured==0)
+		KernelThread::captured=PCB::nop;
 }
 void KernelThread::_thread_create(SysData* data){
 	ID*id=GETPARAM(ID*,3);
@@ -51,7 +50,9 @@ void KernelThread::_thread_create(SysData* data){
 	);
 }
 void KernelThread::_thread_start(SysData* data){
+	asm cli;
 	cout<<"U scheduler stavljen PCB "<<GETPARAM(ID,0)<<'\n';
+	asm sti;
 	Scheduler::put(runningKernelThread->pcbs[GETPARAM(ID,0)]);
 }
 void KernelThread::_thread_join(SysData* data){
@@ -121,31 +122,18 @@ KernelThread* runningKernelThread=KernelThread::getKernelThread(); // initialize
 const IVTNo KernelThread::ivtNo=0x60; //adresa prekidne rutine koja je slobodna
 unsigned KernelThread::task = SET_KERNEL;
 
+fn KernelThread::syscallfn[] = {
+	_sleep,_dispatch,
+	_thread_create,_thread_start,_thread_join,_thread_destroy,
+	_sem_create,_sem_wait,_sem_signal,_sem_val,_sem_destroy,
+	_event_create,_event_wait,_event_signal,_event_destroy
+};
 KernelThread::KernelThread():pcbs(VEC_CAP),semaphores(VEC_CAP),events(VEC_CAP),nestcalls(5){
 	myPCB=new PCB(defaultStackSize,0,0,PCB_KERNEL,0,triggerRun); //id:0, nema thread jer ovo nije thread zapravo
 
 	pcbs.add(myPCB);
 	pcbs.add(PCB::running);
 	pcbs.add(PCB::nop);
-
-	syscallfn[SLEEP]=_sleep;
-	syscallfn[DISPATCH]=_dispatch;
-
-	syscallfn[THREAD_CREATE]=_thread_create;
-	syscallfn[THREAD_JOIN]=_thread_join;
-	syscallfn[THREAD_START]=_thread_start;
-	syscallfn[THREAD_DESTROY]=_thread_destroy;
-
-	syscallfn[SEM_CREATE]=_sem_create;
-	syscallfn[SEM_WAIT]=_sem_wait;
-	syscallfn[SEM_SIGNAL]=_sem_signal;
-	syscallfn[SEM_VAL]=_sem_val;
-	syscallfn[SEM_DESTROY]=_sem_destroy;
-
-	syscallfn[EVENT_CREATE]=_event_create;
-	syscallfn[EVENT_SIGNAL]=_event_signal;
-	syscallfn[EVENT_WAIT]=_event_wait;
-	syscallfn[EVENT_DESTROY]=_event_destroy;
 
 	setvect(ivtNo, routine); // ne mora da je vracamo posto je ovo slobodna zona
 }
@@ -156,12 +144,13 @@ KernelThread* KernelThread::getKernelThread(){
 }
 
 static unsigned tcx,tdx,tbp,tss,tsp;
+static unsigned Ibit = 0x200;
 static unsigned segFn=FP_SEG(KernelThread::triggerRun);
 static unsigned offFn=FP_OFF(KernelThread::triggerRun);
-PCB* KernelThread::blocked = 0;
+PCB* KernelThread::captured = 0;
 
 #define PUSH_FN()\
-	asm pushf;\
+	asm push Ibit;\
 	asm push segFn;\
 	asm push offFn;\
 	asm sub sp, 18
@@ -179,7 +168,6 @@ static NestCall nestcall;
 
 void interrupt KernelThread::routine(...){
 	asm{
-		cli
 		mov tcx, cx
 		mov tdx, dx
 	}
@@ -188,7 +176,7 @@ void interrupt KernelThread::routine(...){
 
 	if(task==SET_KERNEL){ //odi na kernel stek
 		if(!CHK_RFLAG(PCB_KERNEL)){
-			blocked=PCB::running;
+			captured=PCB::running;
 			PCB::running=runningKernelThread->myPCB;
 		}else{
 			nestcall.bp=tbp;
@@ -197,13 +185,12 @@ void interrupt KernelThread::routine(...){
 			runningKernelThread->nestcalls.push(nestcall);
 			PUSH_FN();
 			STORE_REGS(PCB::running);
-		}
-		//cout<<"pcb"<<PCB::running->id <<" trazi kernel\n";
+}
 
 	}else if(task==FINISH_KERNEL){
 		if(runningKernelThread->nestcalls.empty()){
-			PCB::running=blocked;
-			blocked=0;
+			PCB::running=captured;
+			captured=0;
 			RESTORE_KERNEL_STACK(runningKernelThread->myPCB,segFn,offFn);
 		}else{
 			nestcall=runningKernelThread->nestcalls.pop();
@@ -211,7 +198,6 @@ void interrupt KernelThread::routine(...){
 			PCB::running->ss=nestcall.ss;
 			PCB::running->bp=nestcall.bp;
 		}
-		//cout<<"kernel vraca pcb"<<PCB::running->id<<"\n";
 	}
 
 	SET_STATUS_RFLAG(PCB_RUNNING);

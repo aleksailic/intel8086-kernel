@@ -11,19 +11,25 @@
 #include "T_LAB.H"
 #include <STDLIB.H>
 #include <IOSTREAM.H>
+#include "TIMER.H"
+#include "SYS.H"
 
-#define TH_COUNT 7
-#define TH_NUM 6
+#define TH_COUNT 4
+#define TH_NUM 5
 #define MAIN_NUM 3
 
 TLab::A::A():Thread(1024,10){id=lastId++;}
 unsigned TLab::A::lastId=0;
+
 void TLab::A::run(){
 	for (int i =0; i <TH_NUM; i++) {
 		asm cli;
 		cout<<"u a"<< id <<"() i = "<<i<<endl;
 		asm sti;
-		Thread::sleep(rand() % 10);
+
+		//Thread::sleep(rand()%10);
+		for(int j=0;j<30000;j++)
+			for(int k=0;k<30000;k++);
 	}
 }
 
@@ -40,12 +46,11 @@ void TLab::run(){
 		asm cli;
 		cout<<"main "<<i<<endl;
 		asm sti;
-
-		Thread::sleep(4);
+		for(int j=0;j<30000;j++)
+			for(int k=0;k<30000;k++);
 	}
 	for(int k=0;k<TH_COUNT;k++){
 		thA[k].waitToComplete();
-		//cout<<k<<": complete!\n";
 	}
 }
 

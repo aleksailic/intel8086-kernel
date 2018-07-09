@@ -8,7 +8,7 @@
 #ifndef H_VECTOR_H_
 #define H_VECTOR_H_
 
-#include "FLIST.H"
+#include "LIST.H"
 
 template <class T>
 class Vector{
@@ -16,7 +16,7 @@ class Vector{
 	unsigned mcap;
 	unsigned msize;
 	unsigned mcount;
-	FList<int> free; //cuva ispraznjene indekse
+	List<int> free; //cuva ispraznjene indekse
 
 	void resize(){
 		T* n_data = new T[mcap*2];
@@ -41,13 +41,15 @@ public:
 			push_back(el);
 			return msize-1;
 		}else{
-			int ind = *free.get();
+			int ind = free.get();
 			data[ind]=el;
+			mcount++;
 			return ind;
 		}
 	}
 	void remove(int index){
-		free.add(new int(index));
+		free.add(index);
+		mcount--;
 	}
 	T& operator[](int index){
 		return data[index];

@@ -7,9 +7,9 @@
 
 #include "T_FLIST.H"
 #include "PCB.H"
-#include "FLIST.H"
 #include <IOSTREAM.H>
 #include <STDLIB.H>
+#include "LIST.H"
 
 static void setSeed(int seed){
 	for(int i=0;i<seed;i++)
@@ -20,7 +20,7 @@ static const int SEED = 1005;
 
 void TFList::run(){
 	PCB arr[N];
-	FList<PCB> fl;
+	List<PCB*> fl;
 	setSeed(SEED);
 	int index;
 	for(int i=0;i<N;i++){
