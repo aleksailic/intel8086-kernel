@@ -23,13 +23,16 @@ protected:
   unsigned mcount;
 public:
   class iter{
+	friend class List<T>;
     T_w** data;
     unsigned mposition;
   public:
     iter(T_w** data):data(data),mposition(0){}
     iter& next(){
-      data=&((*data)->next);
-      mposition++;
+      if(*data){
+    	  data=&((*data)->next);
+    	  mposition++;
+      }
       return *this;
     }
     T& operator*() { return (*data)->el; }
@@ -42,11 +45,6 @@ public:
     }
     iter& operator++(){
       return next();
-    }
-    void remove(){
-      T_w* next = (*data)->next;
-      delete (*data);
-      *data=next;
     }
     unsigned position()const{
         return mposition;
@@ -69,6 +67,24 @@ public:
     last = (first ? last->next : first) = new T_w(el);
     mcount++;
     return *this;
+  }
+  iter& remove(iter& itr){
+    T_w* next = (*(itr.data))->next;
+    delete (*(itr.data));
+    *(itr.data)=next;
+    mcount--;
+    return itr;
+  }
+  iter& append(iter& itr, const T& el){
+	  (*(itr.data))->next = new T_w(el,(*(itr.data))->next);
+	  if(last->next!=0)last=last->next;
+	  mcount++;
+	  return itr;
+  }
+  iter& prepend(iter& itr, const T& el){
+	  *(itr.data) = new T_w(el,*(itr.data));
+	  mcount++;
+	  return itr.next();
   }
   int empty()const{
     return (first==0 ? 1 : 0);
